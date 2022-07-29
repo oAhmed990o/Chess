@@ -1,52 +1,88 @@
+from numpy import choose
+
+
 class Board:
     def __init__(self):
         self.board = [[None]*8 for i in range(8)]
         self.white_king = [7, 4]
         self.black_king = [0, 4]
 
-    # TODO
+    def choose_promotion(self, color):
+        # make palyer choose promotion through pygame then return the selected promotion
+        pass
+
     def promote(self, player):
-        i = 0 if player.color == 'white' else 7
+        board = self.board
+        color = player.color
+        i = 0 if color == 'white' else 7
         for j in range(8):
-            if self.board[i][j]:
-                if self.board[i][j].typ == 'pawn':
-                    # choose promotion
-                    # self.board[i][j] =
-                    pass
+            if board[i][j]:
+                if board[i][j].typ == 'pawn':
+                    self.board[i][j] = self.choose_promotion(color)
     
-    # TODO
-    def can_king_be_protected(self, player, board):
-        king = self.white_king if player.color == 'white' else self.black_king
-        return False
+    # To be tested
+    def can_king_be_protected(self, player):
+        # king = self.white_king if player.color == 'white' else self.black_king
+        color = player.color
+        board = self.board
+        player_pieces = []
+        for i in range(len(board)):
+            for j in range(len(board)):
+                if board[i][j] and board[i][j].color == color:
+                    player_pieces.append(board[i][j])
+                    
+        for piece in player_pieces: # is possible to call piece functions without passing it a parameter?
+            moves = piece.get_possible_moves(board)
+            for new_pos in moves:
+                if piece.move(new_pos).under_check(player):
+                    return False
+        return True
 
 
-    def checkmate(self, player, board):
+    def checkmate(self, player):
+        board = self.board
         if self.under_check(player, board) and not self.can_king_be_protected(player, board):
             return True
         return False
 
-    # TODO
-    def stalemate(self, player, board):
+    # to be tested
+    def stalemate(self, player):
+        board = self.board
         if not self.under_check(player, board):
-            pass
-        return True
+            color = player.color
+            player_pieces = []
+            for i in range(len(board)):
+                for j in range(len(board)):
+                    if board[i][j] and board[i][j].color == color:
+                        player_pieces.append(board[i][j])
+                        
+            for piece in player_pieces: # is possible to call piece functions without passing it a parameter?
+                if piece.get_possible_moves(board):
+                    return False
+            return True
+        return False
 
-    def end_game(self, player, board):
+    # TODO
+    def end_game(self, player):
+        board = self.board
         if self.checkmate(player, board):
+            # end pygame session and display msg that it's a checkmate
             pass
         elif self.stalemate(player, board):
+            # end pygame session and display msg that it's a stalemate
             pass
 
-    # def en_passant(self):
-    #     pass
+    # TODO
+    def can_en_passant(self):
+        pass
 
-    def under_check(self, player, board):
+    def under_check(self, player):
         if player.color == 'white':
             x, y = self.white_king[0], self.white_king[1]
         else:
             x, y = self.black_king[0], self.black_king[1]
 
-        b = board
+        b = self.board
         # check for pawns
         if player.color == 'white':
             if x-1 >=0 and x-1 <8:

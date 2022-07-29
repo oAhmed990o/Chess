@@ -7,8 +7,8 @@ class Pawn:
     has_moved = False
     # has_moved_two_squares = False
 
-    def can_en_passant(self, board):
-        pass
+    # def can_en_passant(self, board):
+    #     pass
 
     def en_passant(self, board):
         pass

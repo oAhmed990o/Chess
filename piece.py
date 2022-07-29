@@ -17,7 +17,7 @@ class Piece():
     def get_possible_moves(self, board):
         pass
 
-    def move(self, new_pos, board): 
+    def move(self, new_pos, board): # return board and don't modify a class board
         # moves = self.get_possible_moves(board) 
         # if len(moves) > 0:
         #     if new_pos in moves:

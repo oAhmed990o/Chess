@@ -6,11 +6,11 @@ class King(Piece):
     
     has_moved = False
 
-    def can_castle(self):
-        pass
-
-    # def castle(self):
+    # def can_castle(self):
     #     pass
+
+    def castle(self):
+        pass
 
     def get_possible_moves(self, board):
         moves = []
