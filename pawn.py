@@ -1,6 +1,6 @@
 from piece import Piece
 
-class Pawn:
+class Pawn(Piece):
     def __init__(self, pos, color, typ):
         super().__init__(pos, color, typ)
 
