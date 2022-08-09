@@ -1,5 +1,5 @@
 from numpy import choose
-
+import copy
 
 class Board:
     def __init__(self):
@@ -76,28 +76,28 @@ class Board:
     def can_en_passant(self):
         pass
 
-    def under_check(self, player):
-        if player.color == 'white':
+    def under_check(self, player, board):
+        if player.color == 'white': # as I use a temporary board, king position might change, so using the saved pos is incorrect, pass it as parameter if you can
             x, y = self.white_king[0], self.white_king[1]
         else:
             x, y = self.black_king[0], self.black_king[1]
 
-        b = self.board
+        b = board
         # check for pawns
         if player.color == 'white':
             if x-1 >=0 and x-1 <8:
-                if y-1 >=0 and y-1 < 8:
+                if y-1 >=0 and y-1 < 8 and b[x-1][y-1]:
                     if player.color != b[x-1][y-1].color and b[x-1][y-1].typ == 'pawn':
                         return True
-                if y+1 >=0 and y+1 < 8:
+                if y+1 >=0 and y+1 < 8 and b[x-1][y+1]:
                     if player.color != b[x-1][y+1].color and b[x-1][y+1].typ == 'pawn':
                         return True
         else:
             if x+1 >=0 and x+1 <8:
-                if y-1 >=0 and y-1 < 8:
+                if y-1 >=0 and y-1 < 8 and b[x+1][y-1]:
                     if player.color != b[x+1][y-1].color and b[x+1][y-1].typ == 'pawn':
                         return True
-                if y+1 >=0 and y+1 < 8:
+                if y+1 >=0 and y+1 < 8 and b[x+1][y+1]:
                     if player.color != b[x+1][y+1].color and b[x+1][y+1].typ == 'pawn':
                         return True
 
@@ -186,7 +186,15 @@ class Board:
 
         return False
 
-    def is_pinned(self, piece, player):
-        temp_board = self.board
+    def is_pinned(self, piece, player, new_pos):
+        temp_board = copy.deepcopy(self.board)
+        temp_board[new_pos[0]][new_pos[1]] = piece
         temp_board[piece.pos[0]][piece.pos[1]] = None
-        return True if self.under_check(player, temp_board) else False
+        old_pos = piece.pos
+        piece.pos = new_pos
+        if self.under_check(player, temp_board):
+            piece.pos = old_pos
+            return True
+        else:
+            piece.pos = old_pos
+            return False

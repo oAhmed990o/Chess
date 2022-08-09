@@ -71,6 +71,11 @@ if __name__ == "__main__":
     b.board[0][6] = Knight([0, 6], 'black', 'knight')
     b.board[0][7] = Rook([0, 7], 'black', 'rook')
 
+    white = Player('white')
+    white.is_turn_player = True
+    black = Player('black')
+    piece = None
+
     p.init()
     screen = p.display.set_mode((width, height))
     p.display.set_caption('Chess')
@@ -92,27 +97,30 @@ if __name__ == "__main__":
                 pos = p.mouse.get_pos()
                 row, col = get_mouse_row_col(pos)
                 if b.board[row][col]:
-                    piece = b.board[row][col]
-                # if piece:
-                #     pos = p.mouse.get_pos()
-                #     row, col = get_mouse_row_col(pos)
-                #     if [row, col] in piece.get_possible_moves(b.board):
-                #         piece.move([row, col], b.board)
-                # if piece:
-                #     print(piece.pos)
-                if sq_selected == [row,col]:#the user clicked the same square twice
+                    if (b.board[row][col].color == white.color and white.is_turn_player) or (b.board[row][col].color == black.color and black.is_turn_player):
+                        piece = b.board[row][col]
+
+                if sq_selected == [row, col]: # the user clicked the same square twice
                     sq_selected = [] # deselect
                     player_clicks = [] # clear player clicks
                 else:
-                    sq_selected = [row,col]
-                    player_clicks.append(sq_selected)#append for both 1st and 2nd clicks
-                if len(player_clicks) == 2:#after 2nd click
+                    sq_selected = [row, col]
+                    player_clicks.append(sq_selected) # append for both 1st and 2nd clicks
+                if len(player_clicks) == 2: # after 2nd click
                     if piece:
-                        if [row, col] in piece.get_possible_moves(b.board):
+                        player = white if piece.color == white.color else black
+                        row, col = player_clicks[1][0], player_clicks[1][1]
+                        if [row, col] in piece.get_possible_moves(b.board) and not b.is_pinned(piece, player, [row, col]):
+                            print('reached')
                             b.board = piece.move([row, col], b.board)
-                            # print(piece.pos)
+                            if white.is_turn_player:
+                                white.is_turn_player, black.is_turn_player = False, True
+                            else:
+                                white.is_turn_player, black.is_turn_player = True, False
+                        piece = None
                     sq_selected = [] # deselect
                     player_clicks = [] # clear player clicks
+        
         draw_board(screen)
         draw_pieces(screen, b.board)
         clock.tick(FPS)
