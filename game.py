@@ -76,6 +76,58 @@ if __name__ == "__main__":
     black = Player('black')
     piece = None
 
+    # b.board = b.board[6][4].move([5, 4], b.board)
+    # if white.is_turn_player:
+    #     white.is_turn_player, black.is_turn_player = False, True
+    # else:
+    #     white.is_turn_player, black.is_turn_player = True, False
+
+    # b.board = b.board[1][4].move([2, 4], b.board)
+    # if white.is_turn_player:
+    #     white.is_turn_player, black.is_turn_player = False, True
+    # else:
+    #     white.is_turn_player, black.is_turn_player = True, False
+
+    # b.board = b.board[7][2].move([5, 2], b.board)
+    # if white.is_turn_player:
+    #     white.is_turn_player, black.is_turn_player = False, True
+    # else:
+    #     white.is_turn_player, black.is_turn_player = True, False
+
+    # b.board = b.board[0][3].move([4, 7], b.board)
+    # if white.is_turn_player:
+    #     white.is_turn_player, black.is_turn_player = False, True
+    # else:
+    #     white.is_turn_player, black.is_turn_player = True, False
+
+    # player = white if white.is_turn_player else black
+    # if not b.is_pinned(b.board[6][5], player, [5, 5]):
+    #     b.board = b.board[6][5].move([5, 5], b.board)
+    #     if white.is_turn_player:
+    #         white.is_turn_player, black.is_turn_player = False, True
+    #     else:
+    #         white.is_turn_player, black.is_turn_player = True, False
+
+    # p.init()
+    # screen = p.display.set_mode((width, height))
+    # p.display.set_caption('Chess')
+    # load_images()
+    # run = True
+    # clock = p.time.Clock()
+    
+    # while run:
+    #     draw_board(screen)
+    #     draw_pieces(screen, b.board)
+    #     clock.tick(FPS)
+    #     p.display.flip()
+    #     for event in p.event.get():
+    #         if event.type == p.QUIT:
+    #             run = False
+    #         if event.type == p.KEYDOWN:
+    #             if event.key == p.K_ESCAPE:
+    #                 p.quit()
+    
+
     p.init()
     screen = p.display.set_mode((width, height))
     p.display.set_caption('Chess')
@@ -87,6 +139,10 @@ if __name__ == "__main__":
     player_clicks = []
 
     while run:
+        draw_board(screen)
+        draw_pieces(screen, b.board)
+        clock.tick(FPS)
+        p.display.flip()
         for event in p.event.get():
             if event.type == p.QUIT:
                 run = False
@@ -106,23 +162,31 @@ if __name__ == "__main__":
                 else:
                     sq_selected = [row, col]
                     player_clicks.append(sq_selected) # append for both 1st and 2nd clicks
-                if len(player_clicks) == 2: # after 2nd click
-                    if piece:
-                        player = white if piece.color == white.color else black
-                        row, col = player_clicks[1][0], player_clicks[1][1]
-                        if [row, col] in piece.get_possible_moves(b.board) and not b.is_pinned(piece, player, [row, col]):
-                            print('reached')
-                            b.board = piece.move([row, col], b.board)
-                            if white.is_turn_player:
-                                white.is_turn_player, black.is_turn_player = False, True
-                            else:
-                                white.is_turn_player, black.is_turn_player = True, False
+                    if (not piece and len(player_clicks) == 1):
+                        sq_selected = [] # deselect
+                        player_clicks = [] # clear player clicks
+                    if len(player_clicks) == 2: # after 2nd click
+                        if b.board[player_clicks[0][0]][player_clicks[0][1]] and b.board[player_clicks[1][0]][player_clicks[1][1]] and b.board[player_clicks[0][0]][player_clicks[0][1]].color == b.board[player_clicks[1][0]][player_clicks[1][1]].color:
+                            sq_selected = [] # deselect
+                            player_clicks = [] # clear player clicks
+                            continue
+                        if piece:
+                            player = white if piece.color == white.color else black
+                            row, col = player_clicks[1][0], player_clicks[1][1]
+                            if [row, col] in piece.get_possible_moves(b.board) and not b.is_pinned(piece, player, [row, col]):
+                                b.board = piece.move([row, col], b.board)
+                                if white.is_turn_player:
+                                    white.is_turn_player, black.is_turn_player = False, True
+                                else:
+                                    white.is_turn_player, black.is_turn_player = True, False
+                        print(piece.typ) if piece else print('empty', end = ' ')
                         piece = None
-                    sq_selected = [] # deselect
-                    player_clicks = [] # clear player clicks
-        
-        draw_board(screen)
-        draw_pieces(screen, b.board)
-        clock.tick(FPS)
-        p.display.flip()
+                        sq_selected = [] # deselect
+                        player_clicks = [] # clear player clicks
+                        # continue
+            
+        # draw_board(screen)
+        # draw_pieces(screen, b.board)
+        # clock.tick(FPS)
+        # p.display.flip()
     

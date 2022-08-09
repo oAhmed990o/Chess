@@ -77,11 +77,17 @@ class Board:
         pass
 
     def under_check(self, player, board):
-        if player.color == 'white': # as I use a temporary board, king position might change, so using the saved pos is incorrect, pass it as parameter if you can
-            x, y = self.white_king[0], self.white_king[1]
-        else:
-            x, y = self.black_king[0], self.black_king[1]
+        # if player.color == 'white': # as I use a temporary board, king position might change, so using the saved pos is incorrect, pass it as parameter if you can
+        #     x, y = self.white_king[0], self.white_king[1]
+        # else:
+        #     x, y = self.black_king[0], self.black_king[1]
 
+        for i in range(8):
+            for j in range(8):
+                if board[i][j] and board[i][j].typ == 'king' and board[i][j].color == player.color:
+                    x, y = board[i][j].pos[0], board[i][j].pos[1]
+                    break
+                    
         b = board
         # check for pawns
         if player.color == 'white':
@@ -115,6 +121,8 @@ class Board:
             curr_y += 1
             if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
                 if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
                     if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
                         return True
 
@@ -125,6 +133,8 @@ class Board:
             curr_y -= 1
             if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
                 if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
                     if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
                         return True
 
@@ -135,6 +145,8 @@ class Board:
             curr_y -= 1
             if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
                 if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
                     if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
                         return True
 
@@ -145,6 +157,8 @@ class Board:
             curr_y += 1
             if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
                 if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
                     if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
                         return True
         
@@ -154,6 +168,8 @@ class Board:
             curr_x -= 1
             if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
                 if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
                     if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
                         return True
 
@@ -163,6 +179,8 @@ class Board:
             curr_x += 1
             if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
                 if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
                     if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
                         return True
 
@@ -172,6 +190,8 @@ class Board:
             curr_y -= 1
             if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
                 if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
                     if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
                         return True
 
@@ -181,6 +201,8 @@ class Board:
             curr_y += 1
             if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
                 if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
                     if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
                         return True
 
