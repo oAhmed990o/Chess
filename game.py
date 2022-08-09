@@ -32,7 +32,14 @@ def draw_pieces(screen, board):
         for c in range(8):
             if board[r][c]:
                 screen.blit(images[board[r][c].color + '_' + board[r][c].typ], p.Rect(c*(height//8), r*(width//8), (width//8), (height//8)))
-                
+
+def get_mouse_row_col(pos):
+    row = pos[1]//(width//8)
+    col = pos[0]//(width//8)
+    return row, col
+
+def move(board, row, col):
+    pass                
 
 if __name__ == "__main__":
     b = Board()
@@ -40,37 +47,29 @@ if __name__ == "__main__":
     for j in range(8):
         b.board[6][j] = Pawn([6, j], 'white', 'pawn') # pos, color, typ)
     
-    # adding balck pawns
+    # adding blackk pawns
     for j in range(8):
         b.board[1][j] = Pawn([1, j], 'black', 'pawn')
     
     # adding white pieces
     b.board[7][0] = Rook([7, 0], 'white', 'rook')
-    b.board[7][1] = Bishop([7, 1], 'white', 'bishop')
-    b.board[7][2] = Knight([7, 2], 'white', 'knight')
+    b.board[7][1] = Knight([7, 1], 'white', 'knight')
+    b.board[7][2] = Bishop([7, 2], 'white', 'bishop')
     b.board[7][3] = Queen([7, 3], 'white', 'queen')
     b.board[7][4] = King([7, 4], 'white', 'king')
-    b.board[7][5] = Knight([7, 5], 'white', 'knight')
-    b.board[7][6] = Bishop([7, 6], 'white', 'bishop')
+    b.board[7][5] = Bishop([7, 5], 'white', 'bishop')
+    b.board[7][6] = Knight([7, 6], 'white', 'knight')
     b.board[7][7] = Rook([7, 7], 'white', 'rook')
 
     # adding black pieces
     b.board[0][0] = Rook([0, 0], 'black', 'rook')
-    b.board[0][1] = Bishop([0, 1], 'black', 'bishop')
-    b.board[0][2] = Knight([0, 2], 'black', 'knight')
+    b.board[0][1] = Knight([0, 1], 'black', 'knight')
+    b.board[0][2] = Bishop([0, 2], 'black', 'bishop')
     b.board[0][3] = Queen([0, 3], 'black', 'queen')
     b.board[0][4] = King([0, 4], 'black', 'king')
-    b.board[0][5] = Knight([0, 5], 'black', 'knight')
-    b.board[0][6] = Bishop([0, 6], 'black', 'bishop')
+    b.board[0][5] = Bishop([0, 5], 'black', 'bishop')
+    b.board[0][6] = Knight([0, 6], 'black', 'knight')
     b.board[0][7] = Rook([0, 7], 'black', 'rook')
-    
-    # for i in range(8):
-    #     for j in range(8):
-    #         if b.board[i][j]:
-    #             print(b.board[i][j].typ, end = ' ')
-    #         else:
-    #             print('None', end = ' ')
-    #     print('\n')
 
     p.init()
     screen = p.display.set_mode((width, height))
@@ -78,14 +77,44 @@ if __name__ == "__main__":
     load_images()
     run = True
     clock = p.time.Clock()
+    
+    sq_selected = []
+    player_clicks = []
+
     while run:
-        draw_board(screen)
-        draw_pieces(screen, b.board)
-        clock.tick(FPS)
-        p.display.flip()
         for event in p.event.get():
             if event.type == p.QUIT:
                 run = False
             if event.type == p.KEYDOWN:
                 if event.key == p.K_ESCAPE:
                     p.quit()
+            if event.type == p.MOUSEBUTTONDOWN:
+                pos = p.mouse.get_pos()
+                row, col = get_mouse_row_col(pos)
+                if b.board[row][col]:
+                    piece = b.board[row][col]
+                # if piece:
+                #     pos = p.mouse.get_pos()
+                #     row, col = get_mouse_row_col(pos)
+                #     if [row, col] in piece.get_possible_moves(b.board):
+                #         piece.move([row, col], b.board)
+                # if piece:
+                #     print(piece.pos)
+                if sq_selected == [row,col]:#the user clicked the same square twice
+                    sq_selected = [] # deselect
+                    player_clicks = [] # clear player clicks
+                else:
+                    sq_selected = [row,col]
+                    player_clicks.append(sq_selected)#append for both 1st and 2nd clicks
+                if len(player_clicks) == 2:#after 2nd click
+                    if piece:
+                        if [row, col] in piece.get_possible_moves(b.board):
+                            b.board = piece.move([row, col], b.board)
+                            # print(piece.pos)
+                    sq_selected = [] # deselect
+                    player_clicks = [] # clear player clicks
+        draw_board(screen)
+        draw_pieces(screen, b.board)
+        clock.tick(FPS)
+        p.display.flip()
+    
