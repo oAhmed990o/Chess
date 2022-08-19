@@ -20,12 +20,17 @@ def load_images():
     for piece in pieces:
         images[piece] = p.transform.scale(p.image.load('art/' + piece + '.png'), (width//8, height//8))
 
-def draw_board(screen):
+def draw_board(screen, row, col, update):
     colors = [p.Color(240,216,191,255), p.Color(186,85,70,255)]
     for r in range(8):
         for c in range(8):
             color = colors[(r+c)%2]
             p.draw.rect(screen, color, p.Rect(c*(height//8), r*(width//8), (width//8), (height//8)))
+    if update:
+        if (row+col)%2 == 0:
+            p.draw.rect(screen, p.Color(244,232,169,255), p.Rect(col*(height//8), row*(width//8), (width//8), (height//8)))
+        else:
+            p.draw.rect(screen, p.Color(217,167,108,255), p.Rect(col*(height//8), row*(width//8), (width//8), (height//8)))
 
 def draw_pieces(screen, board):
     for r in range(8):
@@ -134,12 +139,14 @@ if __name__ == "__main__":
     load_images()
     run = True
     clock = p.time.Clock()
+    update = False
+    row, col = 0, 0
     
     sq_selected = []
     player_clicks = []
 
     while run:
-        draw_board(screen)
+        draw_board(screen, row, col, update)
         draw_pieces(screen, b.board)
         clock.tick(FPS)
         p.display.flip()
@@ -155,6 +162,7 @@ if __name__ == "__main__":
                 if b.board[row][col]:
                     if (b.board[row][col].color == white.color and white.is_turn_player) or (b.board[row][col].color == black.color and black.is_turn_player):
                         piece = b.board[row][col]
+                        update = True
 
                 if sq_selected == [row, col]: # the user clicked the same square twice
                     sq_selected = [] # deselect
@@ -165,24 +173,27 @@ if __name__ == "__main__":
                     if (not piece and len(player_clicks) == 1):
                         sq_selected = [] # deselect
                         player_clicks = [] # clear player clicks
+                        update = False
                     if len(player_clicks) == 2: # after 2nd click
                         if b.board[player_clicks[0][0]][player_clicks[0][1]] and b.board[player_clicks[1][0]][player_clicks[1][1]] and b.board[player_clicks[0][0]][player_clicks[0][1]].color == b.board[player_clicks[1][0]][player_clicks[1][1]].color:
                             sq_selected = [] # deselect
                             player_clicks = [] # clear player clicks
+                            update = False
                             continue
                         if piece:
                             player = white if piece.color == white.color else black
                             row, col = player_clicks[1][0], player_clicks[1][1]
                             if [row, col] in piece.get_possible_moves(b.board) and not b.is_pinned(piece, player, [row, col]):
                                 b.board = piece.move([row, col], b.board)
+                                update = False
                                 if white.is_turn_player:
                                     white.is_turn_player, black.is_turn_player = False, True
                                 else:
                                     white.is_turn_player, black.is_turn_player = True, False
-                        print(piece.typ) if piece else print('empty', end = ' ')
                         piece = None
                         sq_selected = [] # deselect
                         player_clicks = [] # clear player clicks
+                        update = False
                         # continue
             
         # draw_board(screen)

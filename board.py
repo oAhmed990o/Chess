@@ -11,14 +11,14 @@ class Board:
         # make palyer choose promotion through pygame then return the selected promotion
         pass
 
-    def promote(self, player):
-        board = self.board
-        color = player.color
-        i = 0 if color == 'white' else 7
-        for j in range(8):
-            if board[i][j]:
-                if board[i][j].typ == 'pawn':
-                    self.board[i][j] = self.choose_promotion(color)
+    # def promote(self, player):
+    #     board = self.board
+    #     color = player.color
+    #     i = 0 if color == 'white' else 7
+    #     for j in range(8):
+    #         if board[i][j]:
+    #             if board[i][j].typ == 'pawn':
+    #                 self.board[i][j] = self.choose_promotion(color)
     
     # To be tested
     def can_king_be_protected(self, player):
@@ -63,14 +63,20 @@ class Board:
         return False
 
     # TODO
-    def end_game(self, player):
-        board = self.board
-        if self.checkmate(player, board):
-            # end pygame session and display msg that it's a checkmate
-            pass
-        elif self.stalemate(player, board):
-            # end pygame session and display msg that it's a stalemate
-            pass
+    # def end_game(self, player, width, height):
+    #     board = self.board
+    #     font = p.font.SysFont('Cairo', 72, True, False)
+    #     if self.checkmate(player, board):
+    #         # end pygame session and display msg that it's a checkmate
+    #         text = 'White Wins' if player.color == 'Black' else 'Black Wins'
+    #         text_object = font.render(text, 0, p.Color('Black'))
+    #         text_location = p.Rect(0, 0, width, height).move(width/2 - text_object.get_width()/2, height/2 - text_object.get_height()/2)
+    #         screen.blit(text_object, text_location.move(2, 2))
+    #     elif self.stalemate(player, board):
+    #         # end pygame session and display msg that it's a stalemate
+    #         text_object = font.render('Draw', 0, p.Color('Black'))
+    #         text_location = p.Rect(0, 0, width, height).move(width/2 - text_object.get_width()/2, height/2 - text_object.get_height()/2)
+    #         screen.blit(text_object, text_location.move(2, 2))
 
     # TODO
     def can_en_passant(self):
