@@ -4,11 +4,7 @@ class Pawn(Piece):
     def __init__(self, pos, color, typ):
         super().__init__(pos, color, typ)
 
-    has_moved = False
     # has_moved_two_squares = False
-
-    def can_en_passant(self, board):
-        pass
 
     def en_passant(self, board):
         pass

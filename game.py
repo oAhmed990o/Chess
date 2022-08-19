@@ -190,6 +190,16 @@ if __name__ == "__main__":
                                     white.is_turn_player, black.is_turn_player = False, True
                                 else:
                                     white.is_turn_player, black.is_turn_player = True, False
+                            elif piece.typ == 'king':
+                                out = piece.castle(player, b, [row, col])
+                                if out:
+                                    b.board = out
+                                    update = False
+                                    if white.is_turn_player:
+                                        white.is_turn_player, black.is_turn_player = False, True
+                                    else:
+                                        white.is_turn_player, black.is_turn_player = True, False
+
                         piece = None
                         sq_selected = [] # deselect
                         player_clicks = [] # clear player clicks

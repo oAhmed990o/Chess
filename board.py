@@ -78,9 +78,126 @@ class Board:
     #         text_location = p.Rect(0, 0, width, height).move(width/2 - text_object.get_width()/2, height/2 - text_object.get_height()/2)
     #         screen.blit(text_object, text_location.move(2, 2))
 
-    # TODO
-    def can_en_passant(self):
-        pass
+    def is_square_unsafe(self, player, pos):
+        x, y = pos
+        b = self.board
+        # check for pawns
+        if player.color == 'white':
+            if x-1 >=0 and x-1 <8:
+                if y-1 >=0 and y-1 < 8 and b[x-1][y-1]:
+                    if player.color != b[x-1][y-1].color and b[x-1][y-1].typ == 'pawn':
+                        return True
+                if y+1 >=0 and y+1 < 8 and b[x-1][y+1]:
+                    if player.color != b[x-1][y+1].color and b[x-1][y+1].typ == 'pawn':
+                        return True
+        else:
+            if x+1 >=0 and x+1 <8:
+                if y-1 >=0 and y-1 < 8 and b[x+1][y-1]:
+                    if player.color != b[x+1][y-1].color and b[x+1][y-1].typ == 'pawn':
+                        return True
+                if y+1 >=0 and y+1 < 8 and b[x+1][y+1]:
+                    if player.color != b[x+1][y+1].color and b[x+1][y+1].typ == 'pawn':
+                        return True
+
+        # check for knights
+        for curr_x, curr_y in [[x-2, y-1], [x-2, y+1], [x-1, y-2], [x-1, y+2], [x+1, y-2], [x+1, y+2], [x+2, y-1], [x+2, y+1]]:
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color != b[curr_x][curr_y].color and b[curr_x][curr_y].typ == 'knight':
+                        return True
+
+        # up_right, check for bishops and queens
+        curr_x, curr_y = x, y
+        for i in range(8):
+            curr_x -= 1
+            curr_y += 1
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
+                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
+                        return True
+
+        # down_left, check for bishops and queens
+        curr_x, curr_y = x, y
+        for i in range(8):
+            curr_x += 1
+            curr_y -= 1
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
+                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
+                        return True
+
+        # up_left, check for bishops and queens
+        curr_x, curr_y = x, y
+        for i in range(8):
+            curr_x -= 1
+            curr_y -= 1
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
+                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
+                        return True
+
+        # down_right, check for bishops and queens
+        curr_x, curr_y = x, y
+        for i in range(8):
+            curr_x += 1
+            curr_y += 1
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
+                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
+                        return True
+        
+        # up, check for rooks and queens
+        curr_x, curr_y = x, y
+        for i in range(8):
+            curr_x -= 1
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
+                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
+                        return True
+
+        # down, check for rooks and queens
+        curr_x, curr_y = x, y
+        for i in range(8):
+            curr_x += 1
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
+                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
+                        return True
+
+        # left, check for rooks and queens
+        curr_x, curr_y = x, y
+        for i in range(8):
+            curr_y -= 1
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
+                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
+                        return True
+
+        # right, check for rooks and queens
+        curr_x, curr_y = x, y
+        for i in range(8):
+            curr_y += 1
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
+                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
+                        return True
+        return False
 
     def under_check(self, player, board):
         # if player.color == 'white': # as I use a temporary board, king position might change, so using the saved pos is incorrect, pass it as parameter if you can
