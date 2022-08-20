@@ -1,3 +1,4 @@
+import copy
 from piece import Piece
 from king import King
 from queen import Queen
@@ -41,10 +42,49 @@ def draw_pieces(screen, board):
 def get_mouse_row_col(pos):
     row = pos[1]//(width//8)
     col = pos[0]//(width//8)
-    return row, col
+    return row, col        
 
-def move(board, row, col):
-    pass                
+def promote(board, pos, type):
+    x, y = pos
+    color = board[x][y].color
+    if type.lower() == 'q':
+         promoted = Queen([x, y], color, 'queen')
+    elif type.lower() == 'n':
+        promoted = Knight([x, y], color, 'knight')
+    elif type.lower() == 'r':
+        promoted = Rook([x, y], color, 'rook')
+    elif type.lower() == 'b':
+        promoted = Bishop([x, y], color, 'bishop')
+    else:
+        return
+    board[x][y] = promoted
+    return board
+
+def key_to_char(key):
+    if key == p.K_q:
+        return 'q'
+    if key == p.K_n:
+        return 'n'
+    if key == p.K_r:
+        return 'r'
+    if key == p.K_b:
+        return 'b'
+    else:
+        return ''
+
+def draw_text(screen, text):
+    font = p.font.SysFont('Helvitca', 64, True, False)
+    text_object = font.render(text, 0, p.Color('Black'))
+    text_location = p.Rect(0, 0, width, height).move(width/2 - text_object.get_width()/2, height/2 - text_object.get_height()/2)
+    screen.blit(text_object, text_location)
+
+def switch_players(white):
+    if white.is_turn_player:
+        return [False, True]
+        # white.is_turn_player, black.is_turn_player = False, True
+    else:
+        return [True, False]
+        # white.is_turn_player, black.is_turn_player = True, False
 
 if __name__ == "__main__":
     b = Board()
@@ -80,59 +120,12 @@ if __name__ == "__main__":
     white.is_turn_player = True
     black = Player('black')
     piece = None
-
-    # b.board = b.board[6][4].move([5, 4], b.board)
-    # if white.is_turn_player:
-    #     white.is_turn_player, black.is_turn_player = False, True
-    # else:
-    #     white.is_turn_player, black.is_turn_player = True, False
-
-    # b.board = b.board[1][4].move([2, 4], b.board)
-    # if white.is_turn_player:
-    #     white.is_turn_player, black.is_turn_player = False, True
-    # else:
-    #     white.is_turn_player, black.is_turn_player = True, False
-
-    # b.board = b.board[7][2].move([5, 2], b.board)
-    # if white.is_turn_player:
-    #     white.is_turn_player, black.is_turn_player = False, True
-    # else:
-    #     white.is_turn_player, black.is_turn_player = True, False
-
-    # b.board = b.board[0][3].move([4, 7], b.board)
-    # if white.is_turn_player:
-    #     white.is_turn_player, black.is_turn_player = False, True
-    # else:
-    #     white.is_turn_player, black.is_turn_player = True, False
-
-    # player = white if white.is_turn_player else black
-    # if not b.is_pinned(b.board[6][5], player, [5, 5]):
-    #     b.board = b.board[6][5].move([5, 5], b.board)
-    #     if white.is_turn_player:
-    #         white.is_turn_player, black.is_turn_player = False, True
-    #     else:
-    #         white.is_turn_player, black.is_turn_player = True, False
-
-    # p.init()
-    # screen = p.display.set_mode((width, height))
-    # p.display.set_caption('Chess')
-    # load_images()
-    # run = True
-    # clock = p.time.Clock()
     
-    # while run:
-    #     draw_board(screen)
-    #     draw_pieces(screen, b.board)
-    #     clock.tick(FPS)
-    #     p.display.flip()
-    #     for event in p.event.get():
-    #         if event.type == p.QUIT:
-    #             run = False
-    #         if event.type == p.KEYDOWN:
-    #             if event.key == p.K_ESCAPE:
-    #                 p.quit()
-    
+    # white_2_squares_start_tracker = [False]*8
+    # black_2_squares_start_tracker = [False]*8
 
+    board_stack = []
+    
     p.init()
     screen = p.display.set_mode((width, height))
     p.display.set_caption('Chess')
@@ -146,16 +139,25 @@ if __name__ == "__main__":
     player_clicks = []
 
     while run:
+        
         draw_board(screen, row, col, update)
         draw_pieces(screen, b.board)
         clock.tick(FPS)
         p.display.flip()
+
         for event in p.event.get():
             if event.type == p.QUIT:
                 run = False
             if event.type == p.KEYDOWN:
                 if event.key == p.K_ESCAPE:
                     p.quit()
+            if event.type == p.KEYDOWN:
+                if event.key == p.K_z and p.key.get_mods() & p.KMOD_LCTRL:
+                    if len(board_stack):
+                        b.board = board_stack.pop()
+                    update = False
+                    white.is_turn_player, black.is_turn_player = switch_players(white)
+
             if event.type == p.MOUSEBUTTONDOWN:
                 pos = p.mouse.get_pos()
                 row, col = get_mouse_row_col(pos)
@@ -184,30 +186,44 @@ if __name__ == "__main__":
                             player = white if piece.color == white.color else black
                             row, col = player_clicks[1][0], player_clicks[1][1]
                             if [row, col] in piece.get_possible_moves(b.board) and not b.is_pinned(piece, player, [row, col]):
-                                b.board = piece.move([row, col], b.board)
+                                board_stack.append(copy.deepcopy(b.board))
+                                b.board = piece.move([row, col], b.board)  
+                                if piece.typ == 'pawn':
+                                    if (piece.color == 'white' and row == 0) or (piece.color == 'black' and row == 7):
+                                        out = None
+                                        # draw_text(screen, 'Choose promotion\nq: Queen  n: Knight  r: Rook  b: Bishop')
+                                        while not out:
+                                            # draw_text(screen, 'Choose promotion\nq: Queen  n: Knight  r: Rook  b: Bishop')
+                                            for event in p.event.get():
+                                                # draw_text(screen, 'Choose promotion\nq: Queen  n: Knight  r: Rook  b: Bishop')
+                                                if event.type == p.KEYDOWN:
+                                                    out = promote(b.board, [row, col], key_to_char(event.key))
+                                                    if out:
+                                                        b.board = out
+                                                        break
+                                            
                                 update = False
-                                if white.is_turn_player:
-                                    white.is_turn_player, black.is_turn_player = False, True
-                                else:
-                                    white.is_turn_player, black.is_turn_player = True, False
+                                white.is_turn_player, black.is_turn_player = switch_players(white)
+
                             elif piece.typ == 'king':
                                 out = piece.castle(player, b, [row, col])
                                 if out:
+                                    board_stack.append(copy.deepcopy(b.board))
                                     b.board = out
                                     update = False
-                                    if white.is_turn_player:
-                                        white.is_turn_player, black.is_turn_player = False, True
-                                    else:
-                                        white.is_turn_player, black.is_turn_player = True, False
+                                    white.is_turn_player, black.is_turn_player = switch_players(white)
+
+                            elif piece.typ == 'pawn' and len(board_stack) > 0:
+                                out = piece.en_passant(board_stack[-1], b.board, [row, col])
+                                # print(out)
+                                if out and not b.is_pinned(piece, player, [row, col]):
+                                    board_stack.append(copy.deepcopy(b.board))
+                                    b.board = out
+                                    update = False
+                                    white.is_turn_player, black.is_turn_player = switch_players(white)
 
                         piece = None
                         sq_selected = [] # deselect
                         player_clicks = [] # clear player clicks
                         update = False
-                        # continue
-            
-        # draw_board(screen)
-        # draw_pieces(screen, b.board)
-        # clock.tick(FPS)
-        # p.display.flip()
     

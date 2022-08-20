@@ -4,10 +4,31 @@ class Pawn(Piece):
     def __init__(self, pos, color, typ):
         super().__init__(pos, color, typ)
 
-    # has_moved_two_squares = False
+    def en_passant(self, flashback, board, pos):
+        x, y = pos # new position
+        r, c = self.pos[0], self.pos[1] # current position
+        
+        if self.color == 'white':
+            step = -1 # if 'white'
+        else:
+            step = 1 # if 'black'
+        
+        if board[r][c-1] and board[r][c-1].typ == 'pawn' and board[r][c-1].color != self.color and (board[r+2*step][c-1] is None) and flashback[r+2*step][c-1] and flashback[r+2*step][c-1].typ == 'pawn' and flashback[r+2*step][c-1].color != self.color and (flashback[r][c-1] is None):
+            if x == r+step and y == c-1:
+                board[r][c-1] = None # remove opp pawn
+                board[x][y] = self # move player's pawn
+                board[r][c] = None # remove player's pawn from old pos
+                self.pos = [x, y] # update piece's pos
+                return board
 
-    def en_passant(self, board):
-        pass
+        if board[r][c+1] and board[r][c+1].typ == 'pawn' and board[r][c+1].color != self.color and (board[r+2*step][c+1] is None) and flashback[r+2*step][c+1] and flashback[r+2*step][c+1].typ == 'pawn' and flashback[r+2*step][c+1].color != self.color and (flashback[r][c+1] is None):
+            if x == r+step and y == c+1:
+                board[r][c+1] = None # remove opp pawn
+                board[x][y] = self # move player's pawn
+                board[r][c] = None # remove player's pawn from old pos
+                self.pos = [x, y] # update piece's pos
+                return board
+        return
 
     def get_possible_moves(self, board):
         moves = []
@@ -19,10 +40,6 @@ class Pawn(Piece):
         if not self.has_moved:
             if board[x+step][y] is None and board[x+step*2][y] is None:
                 moves.append([x+step*2, y])
-
-        # if can en-passant
-        if self.can_en_passant(board):
-            moves.append(self.en_passant, board)
 
         # if can take
         if x+step >= 0 and y-1 >= 0 and x+step < 8 and y-1 < 8:

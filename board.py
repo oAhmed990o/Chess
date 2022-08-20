@@ -1,4 +1,3 @@
-from numpy import choose
 import copy
 
 class Board:
@@ -6,19 +5,6 @@ class Board:
         self.board = [[None]*8 for i in range(8)]
         self.white_king = [7, 4]
         self.black_king = [0, 4]
-
-    def choose_promotion(self, color):
-        # make palyer choose promotion through pygame then return the selected promotion
-        pass
-
-    # def promote(self, player):
-    #     board = self.board
-    #     color = player.color
-    #     i = 0 if color == 'white' else 7
-    #     for j in range(8):
-    #         if board[i][j]:
-    #             if board[i][j].typ == 'pawn':
-    #                 self.board[i][j] = self.choose_promotion(color)
     
     # To be tested
     def can_king_be_protected(self, player):
