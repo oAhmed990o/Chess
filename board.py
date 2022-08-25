@@ -7,10 +7,9 @@ class Board:
         self.black_king = [0, 4]
     
     # To be tested
-    def can_king_be_protected(self, player):
+    def can_king_be_protected(self, player, flashback, board):
         # king = self.white_king if player.color == 'white' else self.black_king
         color = player.color
-        board = self.board
         player_pieces = []
         for i in range(len(board)):
             for j in range(len(board)):
@@ -19,20 +18,33 @@ class Board:
                     
         for piece in player_pieces: # is possible to call piece functions without passing it a parameter?
             moves = piece.get_possible_moves(board)
+            
             for new_pos in moves:
-                if piece.move(new_pos).under_check(player):
-                    return False
-        return True
+                b = copy.deepcopy(board)
+                p = copy.deepcopy(piece)
+                if not self.under_check(player, p.move(new_pos, b)):
+                    return True
+
+                # add casling and en-passant to the move options
+                if p.typ == 'king':
+                    out = p.castle(player, board, new_pos)
+                    if out and not self.under_check(player, p.castle(player, board, new_pos)):
+                        return True
+
+                if p.typ == 'pawn':
+                    out = p.en_passant(flashback, board, new_pos)
+                    if out and not self.under_check(player, p.en_passant(flashback, board, new_pos)):
+                        return True
+        return False
 
 
-    def checkmate(self, player):
-        board = self.board
-        if self.under_check(player, board) and not self.can_king_be_protected(player, board):
+    def checkmate(self, player, flashback, board): 
+        if self.under_check(player, board) and not self.can_king_be_protected(player, flashback, board):
             return True
         return False
 
     # to be tested
-    def stalemate(self, player):
+    def stalemate(self, player, board):
         board = self.board
         if not self.under_check(player, board):
             color = player.color
@@ -47,22 +59,6 @@ class Board:
                     return False
             return True
         return False
-
-    # TODO
-    # def end_game(self, player, width, height):
-    #     board = self.board
-    #     font = p.font.SysFont('Cairo', 72, True, False)
-    #     if self.checkmate(player, board):
-    #         # end pygame session and display msg that it's a checkmate
-    #         text = 'White Wins' if player.color == 'Black' else 'Black Wins'
-    #         text_object = font.render(text, 0, p.Color('Black'))
-    #         text_location = p.Rect(0, 0, width, height).move(width/2 - text_object.get_width()/2, height/2 - text_object.get_height()/2)
-    #         screen.blit(text_object, text_location.move(2, 2))
-    #     elif self.stalemate(player, board):
-    #         # end pygame session and display msg that it's a stalemate
-    #         text_object = font.render('Draw', 0, p.Color('Black'))
-    #         text_location = p.Rect(0, 0, width, height).move(width/2 - text_object.get_width()/2, height/2 - text_object.get_height()/2)
-    #         screen.blit(text_object, text_location.move(2, 2))
 
     def is_square_unsafe(self, player, pos):
         x, y = pos

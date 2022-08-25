@@ -72,8 +72,8 @@ def key_to_char(key):
     else:
         return ''
 
-def draw_text(screen, text):
-    font = p.font.SysFont('Helvitca', 64, True, False)
+def draw_text(screen, font_size, text):
+    font = p.font.SysFont('Cairo', font_size, True, False)
     text_object = font.render(text, 0, p.Color('Black'))
     text_location = p.Rect(0, 0, width, height).move(width/2 - text_object.get_width()/2, height/2 - text_object.get_height()/2)
     screen.blit(text_object, text_location)
@@ -81,10 +81,41 @@ def draw_text(screen, text):
 def switch_players(white):
     if white.is_turn_player:
         return [False, True]
-        # white.is_turn_player, black.is_turn_player = False, True
     else:
         return [True, False]
-        # white.is_turn_player, black.is_turn_player = True, False
+
+def board_to_string(board):
+    ans = []
+    for i in range(8):
+        for j in range(8):
+            if not board[i][j]:
+                ans.append('..')
+                continue
+            color = 'w' if board[i][j].color == 'white' else 'b'
+            if board[i][j].typ == 'pawn':
+                ans.append(color + 'p')
+            elif board[i][j].typ == 'bishop':
+                ans.append(color + 'b')
+            elif board[i][j].typ == 'knight':
+                ans.append(color + 'n')
+            elif board[i][j].typ == 'rook':
+                ans.append(color + 'r')
+            elif board[i][j].typ == 'queen':
+                ans.append(color + 'q')
+            elif board[i][j].typ == 'king':
+                ans.append(color + 'k')
+    return ''.join(ans)
+
+def quit_game(text):
+    while 1:
+        draw_text(screen, 64, text)
+        p.display.update()
+        for event in p.event.get():
+            if event.type == p.QUIT:
+                p.quit()
+            if event.type == p.KEYDOWN:
+                if event.key == p.K_ESCAPE:
+                    p.quit()
 
 if __name__ == "__main__":
     b = Board()
@@ -121,11 +152,9 @@ if __name__ == "__main__":
     black = Player('black')
     piece = None
     
-    # white_2_squares_start_tracker = [False]*8
-    # black_2_squares_start_tracker = [False]*8
-
     board_stack = []
-    
+    board_count = {}
+
     p.init()
     screen = p.display.set_mode((width, height))
     p.display.set_caption('Chess')
@@ -139,11 +168,20 @@ if __name__ == "__main__":
     player_clicks = []
 
     while run:
-        
+
         draw_board(screen, row, col, update)
         draw_pieces(screen, b.board)
         clock.tick(FPS)
         p.display.flip()
+
+        pl = white if white.is_turn_player else black
+        if len(board_stack):
+            if b.checkmate(pl, board_stack[-1], b.board):
+                color = 'White' if pl.color == 'black' else 'Black'
+                quit_game(color + ' wins by checkmate')
+
+        if b.stalemate(pl, b.board):
+            quit_game('Stalemate')
 
         for event in p.event.get():
             if event.type == p.QUIT:
@@ -187,15 +225,19 @@ if __name__ == "__main__":
                             row, col = player_clicks[1][0], player_clicks[1][1]
                             if [row, col] in piece.get_possible_moves(b.board) and not b.is_pinned(piece, player, [row, col]):
                                 board_stack.append(copy.deepcopy(b.board))
-                                b.board = piece.move([row, col], b.board)  
+                                board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
+                                '*******************************************************************************************************************************'
+                                b.board = piece.move([row, col], b.board)
+                                if board_count.get(board_to_string(b.board)) and board_count[board_to_string(b.board)] == 2:
+                                    quit_game('Draw by repetition')
+                                '*******************************************************************************************************************************'
                                 if piece.typ == 'pawn':
                                     if (piece.color == 'white' and row == 0) or (piece.color == 'black' and row == 7):
                                         out = None
-                                        # draw_text(screen, 'Choose promotion\nq: Queen  n: Knight  r: Rook  b: Bishop')
                                         while not out:
-                                            # draw_text(screen, 'Choose promotion\nq: Queen  n: Knight  r: Rook  b: Bishop')
+                                            draw_text(screen, 40, 'Choose promotion q: Queen  n: Knight  r: Rook  b: Bishop')
+                                            p.display.update()
                                             for event in p.event.get():
-                                                # draw_text(screen, 'Choose promotion\nq: Queen  n: Knight  r: Rook  b: Bishop')
                                                 if event.type == p.KEYDOWN:
                                                     out = promote(b.board, [row, col], key_to_char(event.key))
                                                     if out:
@@ -209,16 +251,25 @@ if __name__ == "__main__":
                                 out = piece.castle(player, b, [row, col])
                                 if out:
                                     board_stack.append(copy.deepcopy(b.board))
+                                    board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
+                                    '*******************************************************************************************************************************'
                                     b.board = out
+                                    if board_count.get(board_to_string(b.board)) and board_count[board_to_string(b.board)] == 2:
+                                        quit_game('Draw by repetition')
+                                    '*******************************************************************************************************************************'
                                     update = False
                                     white.is_turn_player, black.is_turn_player = switch_players(white)
 
                             elif piece.typ == 'pawn' and len(board_stack) > 0:
                                 out = piece.en_passant(board_stack[-1], b.board, [row, col])
-                                # print(out)
                                 if out and not b.is_pinned(piece, player, [row, col]):
                                     board_stack.append(copy.deepcopy(b.board))
+                                    board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
+                                    '*******************************************************************************************************************************'
                                     b.board = out
+                                    if board_count.get(board_to_string(b.board)) and board_count[board_to_string(b.board)] == 2:
+                                        quit_game('Draw by repetition')
+                                    '*******************************************************************************************************************************'
                                     update = False
                                     white.is_turn_player, black.is_turn_player = switch_players(white)
 

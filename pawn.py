@@ -13,7 +13,7 @@ class Pawn(Piece):
         else:
             step = 1 # if 'black'
         
-        if board[r][c-1] and board[r][c-1].typ == 'pawn' and board[r][c-1].color != self.color and (board[r+2*step][c-1] is None) and flashback[r+2*step][c-1] and flashback[r+2*step][c-1].typ == 'pawn' and flashback[r+2*step][c-1].color != self.color and (flashback[r][c-1] is None):
+        if c-1 >= 0 and board[r][c-1] and board[r][c-1].typ == 'pawn' and board[r][c-1].color != self.color and (board[r+2*step][c-1] is None) and flashback[r+2*step][c-1] and flashback[r+2*step][c-1].typ == 'pawn' and flashback[r+2*step][c-1].color != self.color and (flashback[r][c-1] is None):
             if x == r+step and y == c-1:
                 board[r][c-1] = None # remove opp pawn
                 board[x][y] = self # move player's pawn
@@ -21,7 +21,7 @@ class Pawn(Piece):
                 self.pos = [x, y] # update piece's pos
                 return board
 
-        if board[r][c+1] and board[r][c+1].typ == 'pawn' and board[r][c+1].color != self.color and (board[r+2*step][c+1] is None) and flashback[r+2*step][c+1] and flashback[r+2*step][c+1].typ == 'pawn' and flashback[r+2*step][c+1].color != self.color and (flashback[r][c+1] is None):
+        if c+1 < 8 and board[r][c+1] and board[r][c+1].typ == 'pawn' and board[r][c+1].color != self.color and (board[r+2*step][c+1] is None) and flashback[r+2*step][c+1] and flashback[r+2*step][c+1].typ == 'pawn' and flashback[r+2*step][c+1].color != self.color and (flashback[r][c+1] is None):
             if x == r+step and y == c+1:
                 board[r][c+1] = None # remove opp pawn
                 board[x][y] = self # move player's pawn
