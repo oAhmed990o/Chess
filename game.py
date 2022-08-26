@@ -226,11 +226,11 @@ if __name__ == "__main__":
                             if [row, col] in piece.get_possible_moves(b.board) and not b.is_pinned(piece, player, [row, col]):
                                 board_stack.append(copy.deepcopy(b.board))
                                 board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
-                                '*******************************************************************************************************************************'
+                                
                                 b.board = piece.move([row, col], b.board)
                                 if board_count.get(board_to_string(b.board)) and board_count[board_to_string(b.board)] == 2:
                                     quit_game('Draw by repetition')
-                                '*******************************************************************************************************************************'
+                                
                                 if piece.typ == 'pawn':
                                     if (piece.color == 'white' and row == 0) or (piece.color == 'black' and row == 7):
                                         out = None
@@ -252,11 +252,11 @@ if __name__ == "__main__":
                                 if out:
                                     board_stack.append(copy.deepcopy(b.board))
                                     board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
-                                    '*******************************************************************************************************************************'
+                                    
                                     b.board = out
                                     if board_count.get(board_to_string(b.board)) and board_count[board_to_string(b.board)] == 2:
                                         quit_game('Draw by repetition')
-                                    '*******************************************************************************************************************************'
+                                    
                                     update = False
                                     white.is_turn_player, black.is_turn_player = switch_players(white)
 
@@ -265,11 +265,11 @@ if __name__ == "__main__":
                                 if out and not b.is_pinned(piece, player, [row, col]):
                                     board_stack.append(copy.deepcopy(b.board))
                                     board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
-                                    '*******************************************************************************************************************************'
+                                    
                                     b.board = out
                                     if board_count.get(board_to_string(b.board)) and board_count[board_to_string(b.board)] == 2:
                                         quit_game('Draw by repetition')
-                                    '*******************************************************************************************************************************'
+                                    
                                     update = False
                                     white.is_turn_player, black.is_turn_player = switch_players(white)
 

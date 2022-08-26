@@ -5,8 +5,198 @@ class Board:
         self.board = [[None]*8 for i in range(8)]
         self.white_king = [7, 4]
         self.black_king = [0, 4]
+
+    def check_for_knights(self, player, b, x, y):
+        for curr_x, curr_y in [[x-2, y-1], [x-2, y+1], [x-1, y-2], [x-1, y+2], [x+1, y-2], [x+1, y+2], [x+2, y-1], [x+2, y+1]]:
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color != b[curr_x][curr_y].color and b[curr_x][curr_y].typ == 'knight':
+                        return True
+        return False
+
+    def check_for_bishops_queens_up_right(self, player, b, curr_x, curr_y):
+        for i in range(8):
+            curr_x -= 1
+            curr_y += 1
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
+                    if player.color != b[curr_x][curr_y].color and b[curr_x][curr_y].typ != 'bishop' and b[curr_x][curr_y].typ != 'queen':
+                        break 
+                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
+                        return True
+        return False
+
+    def check_for_bishops_queens_down_left(self, player, b, curr_x, curr_y):
+        for i in range(8):
+            curr_x += 1
+            curr_y -= 1
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
+                    if player.color != b[curr_x][curr_y].color and b[curr_x][curr_y].typ != 'bishop' and b[curr_x][curr_y].typ != 'queen':
+                        break
+                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
+                        return True
+        return False
     
-    # To be tested
+    def check_for_bishops_queens_up_left(self, player, b, curr_x, curr_y):
+        for i in range(8):
+            curr_x -= 1
+            curr_y -= 1
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
+                    if player.color != b[curr_x][curr_y].color and b[curr_x][curr_y].typ != 'bishop' and b[curr_x][curr_y].typ != 'queen':
+                        break
+                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
+                        return True
+        return False
+
+    def check_for_bishops_queens_down_right(self, player, b, curr_x, curr_y):
+        for i in range(8):
+            curr_x += 1
+            curr_y += 1
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
+                    if player.color != b[curr_x][curr_y].color and b[curr_x][curr_y].typ != 'bishop' and b[curr_x][curr_y].typ != 'queen':
+                        break
+                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
+                        return True
+        return False
+
+    def check_for_rooks_queens_up(self, player, b, curr_x, curr_y):
+        for i in range(8):
+            curr_x -= 1
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
+                    if player.color != b[curr_x][curr_y].color and b[curr_x][curr_y].typ != 'rook' and b[curr_x][curr_y].typ != 'queen':
+                        break
+                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
+                        return True
+        return False
+
+    def check_for_rooks_queens_down(self, player, b, curr_x, curr_y):
+        for i in range(8):
+            curr_x += 1
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
+                    if player.color != b[curr_x][curr_y].color and b[curr_x][curr_y].typ != 'rook' and b[curr_x][curr_y].typ != 'queen':
+                        break
+                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
+                        return True
+        return False
+
+    def check_for_rooks_queens_left(self, player, b, curr_x, curr_y):
+        for i in range(8):
+            curr_y -= 1
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
+                    if player.color != b[curr_x][curr_y].color and b[curr_x][curr_y].typ != 'rook' and b[curr_x][curr_y].typ != 'queen':
+                        break
+                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
+                        return True
+        return False
+
+    def check_for_rooks_queens_right(self, player, b, curr_x, curr_y):
+        for i in range(8):
+            curr_y += 1
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color == b[curr_x][curr_y].color:
+                        break
+                    if player.color != b[curr_x][curr_y].color and b[curr_x][curr_y].typ != 'rook' and b[curr_x][curr_y].typ != 'queen':
+                        break
+                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
+                        return True
+        return False
+
+    def check_for_pawns(self, player, b, x, y):
+        if player.color == 'white':
+            if x-1 >=0 and x-1 <8:
+                if y-1 >=0 and y-1 < 8 and b[x-1][y-1]:
+                    if player.color != b[x-1][y-1].color and b[x-1][y-1].typ == 'pawn':
+                        return True
+                if y+1 >=0 and y+1 < 8 and b[x-1][y+1]:
+                    if player.color != b[x-1][y+1].color and b[x-1][y+1].typ == 'pawn':
+                        return True
+        else:
+            if x+1 >=0 and x+1 <8:
+                if y-1 >=0 and y-1 < 8 and b[x+1][y-1]:
+                    if player.color != b[x+1][y-1].color and b[x+1][y-1].typ == 'pawn':
+                        return True
+                if y+1 >=0 and y+1 < 8 and b[x+1][y+1]:
+                    if player.color != b[x+1][y+1].color and b[x+1][y+1].typ == 'pawn':
+                        return True
+        return False
+
+    def check_for_king(self, player, b, x, y):
+        positions = [[x-1, y-1], [x-1, y], [x-1, y+1], [x, y-1], [x, y+1], [x+1, y-1], [x+1, y],  [x+1, y+1]]
+        for curr_x, curr_y in positions:
+            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
+                if b[curr_x][curr_y]:
+                    if player.color != b[curr_x][curr_y].color and b[curr_x][curr_y].typ == 'king':
+                        return True
+        return False
+
+    def threat_exists(self, player, b, x, y):
+        # check for pawns
+        if self.check_for_pawns(player, b, x, y):
+            return True
+
+        # check for knights
+        if self.check_for_knights(player, b, x, y):
+            return True
+
+        # up_right, check for bishops and queens
+        if self.check_for_bishops_queens_up_right(player, b, x, y):
+            return True
+
+        # down_left, check for bishops and queens
+        if self.check_for_bishops_queens_down_left(player, b, x, y):
+            return True
+
+        # up_left, check for bishops and queens
+        if self.check_for_bishops_queens_up_left(player, b, x, y):
+            return True
+
+        # down_right, check for bishops and queens
+        if self.check_for_bishops_queens_down_right(player, b, x, y):
+            return True
+        
+        # up, check for rooks and queens
+        if self.check_for_rooks_queens_up(player, b, x, y):
+            return True
+
+        # down, check for rooks and queens
+        if self.check_for_rooks_queens_down(player, b, x, y):
+            return True
+        
+        # left, check for rooks and queens
+        if self.check_for_rooks_queens_left(player, b, x, y):
+            return True
+        
+        # right, check for rooks and queens
+        if self.check_for_rooks_queens_right(player, b, x, y):
+            return True
+        
+        # check for a king
+        if self.check_for_king(player, b, x, y):
+            return True
+        
+        return False
+
     def can_king_be_protected(self, player, flashback, board):
         # king = self.white_king if player.color == 'white' else self.black_king
         color = player.color
@@ -63,122 +253,10 @@ class Board:
     def is_square_unsafe(self, player, pos):
         x, y = pos
         b = self.board
-        # check for pawns
-        if player.color == 'white':
-            if x-1 >=0 and x-1 <8:
-                if y-1 >=0 and y-1 < 8 and b[x-1][y-1]:
-                    if player.color != b[x-1][y-1].color and b[x-1][y-1].typ == 'pawn':
-                        return True
-                if y+1 >=0 and y+1 < 8 and b[x-1][y+1]:
-                    if player.color != b[x-1][y+1].color and b[x-1][y+1].typ == 'pawn':
-                        return True
-        else:
-            if x+1 >=0 and x+1 <8:
-                if y-1 >=0 and y-1 < 8 and b[x+1][y-1]:
-                    if player.color != b[x+1][y-1].color and b[x+1][y-1].typ == 'pawn':
-                        return True
-                if y+1 >=0 and y+1 < 8 and b[x+1][y+1]:
-                    if player.color != b[x+1][y+1].color and b[x+1][y+1].typ == 'pawn':
-                        return True
 
-        # check for knights
-        for curr_x, curr_y in [[x-2, y-1], [x-2, y+1], [x-1, y-2], [x-1, y+2], [x+1, y-2], [x+1, y+2], [x+2, y-1], [x+2, y+1]]:
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color != b[curr_x][curr_y].color and b[curr_x][curr_y].typ == 'knight':
-                        return True
-
-        # up_right, check for bishops and queens
-        curr_x, curr_y = x, y
-        for i in range(8):
-            curr_x -= 1
-            curr_y += 1
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color == b[curr_x][curr_y].color:
-                        break
-                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
-                        return True
-
-        # down_left, check for bishops and queens
-        curr_x, curr_y = x, y
-        for i in range(8):
-            curr_x += 1
-            curr_y -= 1
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color == b[curr_x][curr_y].color:
-                        break
-                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
-                        return True
-
-        # up_left, check for bishops and queens
-        curr_x, curr_y = x, y
-        for i in range(8):
-            curr_x -= 1
-            curr_y -= 1
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color == b[curr_x][curr_y].color:
-                        break
-                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
-                        return True
-
-        # down_right, check for bishops and queens
-        curr_x, curr_y = x, y
-        for i in range(8):
-            curr_x += 1
-            curr_y += 1
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color == b[curr_x][curr_y].color:
-                        break
-                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
-                        return True
-        
-        # up, check for rooks and queens
-        curr_x, curr_y = x, y
-        for i in range(8):
-            curr_x -= 1
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color == b[curr_x][curr_y].color:
-                        break
-                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
-                        return True
-
-        # down, check for rooks and queens
-        curr_x, curr_y = x, y
-        for i in range(8):
-            curr_x += 1
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color == b[curr_x][curr_y].color:
-                        break
-                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
-                        return True
-
-        # left, check for rooks and queens
-        curr_x, curr_y = x, y
-        for i in range(8):
-            curr_y -= 1
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color == b[curr_x][curr_y].color:
-                        break
-                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
-                        return True
-
-        # right, check for rooks and queens
-        curr_x, curr_y = x, y
-        for i in range(8):
-            curr_y += 1
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color == b[curr_x][curr_y].color:
-                        break
-                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
-                        return True
+        if self.threat_exists(player, b, x, y):
+            return True
+    
         return False
 
     def under_check(self, player, board):
@@ -194,122 +272,9 @@ class Board:
                     break
                     
         b = board
-        # check for pawns
-        if player.color == 'white':
-            if x-1 >=0 and x-1 <8:
-                if y-1 >=0 and y-1 < 8 and b[x-1][y-1]:
-                    if player.color != b[x-1][y-1].color and b[x-1][y-1].typ == 'pawn':
-                        return True
-                if y+1 >=0 and y+1 < 8 and b[x-1][y+1]:
-                    if player.color != b[x-1][y+1].color and b[x-1][y+1].typ == 'pawn':
-                        return True
-        else:
-            if x+1 >=0 and x+1 <8:
-                if y-1 >=0 and y-1 < 8 and b[x+1][y-1]:
-                    if player.color != b[x+1][y-1].color and b[x+1][y-1].typ == 'pawn':
-                        return True
-                if y+1 >=0 and y+1 < 8 and b[x+1][y+1]:
-                    if player.color != b[x+1][y+1].color and b[x+1][y+1].typ == 'pawn':
-                        return True
-
-        # check for knights
-        for curr_x, curr_y in [[x-2, y-1], [x-2, y+1], [x-1, y-2], [x-1, y+2], [x+1, y-2], [x+1, y+2], [x+2, y-1], [x+2, y+1]]:
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color != b[curr_x][curr_y].color and b[curr_x][curr_y].typ == 'knight':
-                        return True
-
-        # up_right, check for bishops and queens
-        curr_x, curr_y = x, y
-        for i in range(8):
-            curr_x -= 1
-            curr_y += 1
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color == b[curr_x][curr_y].color:
-                        break
-                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
-                        return True
-
-        # down_left, check for bishops and queens
-        curr_x, curr_y = x, y
-        for i in range(8):
-            curr_x += 1
-            curr_y -= 1
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color == b[curr_x][curr_y].color:
-                        break
-                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
-                        return True
-
-        # up_left, check for bishops and queens
-        curr_x, curr_y = x, y
-        for i in range(8):
-            curr_x -= 1
-            curr_y -= 1
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color == b[curr_x][curr_y].color:
-                        break
-                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
-                        return True
-
-        # down_right, check for bishops and queens
-        curr_x, curr_y = x, y
-        for i in range(8):
-            curr_x += 1
-            curr_y += 1
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color == b[curr_x][curr_y].color:
-                        break
-                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'bishop' or b[curr_x][curr_y].typ == 'queen'):
-                        return True
         
-        # up, check for rooks and queens
-        curr_x, curr_y = x, y
-        for i in range(8):
-            curr_x -= 1
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color == b[curr_x][curr_y].color:
-                        break
-                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
-                        return True
-
-        # down, check for rooks and queens
-        curr_x, curr_y = x, y
-        for i in range(8):
-            curr_x += 1
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color == b[curr_x][curr_y].color:
-                        break
-                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
-                        return True
-
-        # left, check for rooks and queens
-        curr_x, curr_y = x, y
-        for i in range(8):
-            curr_y -= 1
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color == b[curr_x][curr_y].color:
-                        break
-                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
-                        return True
-
-        # right, check for rooks and queens
-        curr_x, curr_y = x, y
-        for i in range(8):
-            curr_y += 1
-            if curr_x >= 0 and curr_y >= 0 and curr_x < 8 and curr_y < 8:
-                if b[curr_x][curr_y]:
-                    if player.color == b[curr_x][curr_y].color:
-                        break
-                    if player.color != b[curr_x][curr_y].color and (b[curr_x][curr_y].typ == 'rook' or b[curr_x][curr_y].typ == 'queen'):
-                        return True
+        if self.threat_exists(player, b, x, y):
+            return True
 
         return False
 
