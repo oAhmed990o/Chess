@@ -166,8 +166,9 @@ if __name__ == "__main__":
     
     sq_selected = []
     player_clicks = []
-
+    
     fifty_move_rule = 0
+    num_pieces = 32
     has_any_pawn_moved = False
 
     while run:
@@ -179,13 +180,14 @@ if __name__ == "__main__":
 
         player = white if white.is_turn_player else black
         if len(board_stack):
-            if b.checkmate(player, board_stack[-1], b.board):
+            if b.checkmate(player, board_stack[-1][0], b.board):
                 color = 'White' if player.color == 'black' else 'Black'
                 quit_game(color + ' wins by checkmate')
 
         if b.stalemate(player, b.board):
             quit_game('Stalemate')
 
+        curr_piece_count = 0
         white_pieces, black_pieces = [], []
         for i in range(8):
             for j in range(8):
@@ -196,6 +198,9 @@ if __name__ == "__main__":
         
         if b.insuficient_material(white_pieces, black_pieces):
             quit_game('Draw due to insuficient material')
+        
+        if fifty_move_rule == 100:
+            quit_game('Draw due to no progress')
 
         for event in p.event.get():
             if event.type == p.QUIT:
@@ -206,7 +211,8 @@ if __name__ == "__main__":
             if event.type == p.KEYDOWN:
                 if event.key == p.K_z and p.key.get_mods() & p.KMOD_LCTRL:
                     if len(board_stack):
-                        b.board = board_stack.pop()
+                        b.board, [fifty_move_rule, curr_piece_count, has_any_pawn_moved] = board_stack.pop()
+                        print(fifty_move_rule, curr_piece_count, has_any_pawn_moved)
                     update = False
                     white.is_turn_player, black.is_turn_player = switch_players(white)
 
@@ -234,11 +240,11 @@ if __name__ == "__main__":
                             player_clicks = [] # clear player clicks
                             update = False
                             continue
+                        
                         if piece:
-                            # player = white if piece.color == white.color else black
                             row, col = player_clicks[1][0], player_clicks[1][1]
                             if [row, col] in piece.get_possible_moves(b.board) and not b.is_pinned(piece, player, [row, col]):
-                                board_stack.append(copy.deepcopy(b.board))
+                                board_stack.append([copy.deepcopy(b.board), [fifty_move_rule, curr_piece_count, has_any_pawn_moved]])
                                 board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
                                 
                                 b.board = piece.move([row, col], b.board)
@@ -247,6 +253,7 @@ if __name__ == "__main__":
                                     quit_game('Draw by repetition')
                                 
                                 if piece.typ == 'pawn':
+                                    has_any_pawn_moved = True
                                     if (piece.color == 'white' and row == 0) or (piece.color == 'black' and row == 7):
                                         out = None
                                         while not out:
@@ -258,6 +265,19 @@ if __name__ == "__main__":
                                                     if out:
                                                         b.board = out
                                                         break
+
+                                curr_piece_count = 0
+                                for i in range(8):
+                                    for j in range(8):
+                                        if b.board[i][j]:
+                                            curr_piece_count += 1
+                                if num_pieces == curr_piece_count and not has_any_pawn_moved:
+                                    fifty_move_rule += 1
+
+                                if has_any_pawn_moved or (num_pieces != curr_piece_count):
+                                    fifty_move_rule = 0 # incremented if the same number of pieces remains
+                                    has_any_pawn_moved = False # if a pawn moves it's set to true
+                                    num_pieces = curr_piece_count # changes only if curr_piece_count is different
                                             
                                 update = False
                                 white.is_turn_player, black.is_turn_player = switch_players(white)
@@ -266,26 +286,53 @@ if __name__ == "__main__":
                                 
                                 out = piece.castle(player, b, [row, col])
                                 if out:
-                                    board_stack.append(copy.deepcopy(b.board))
+                                    board_stack.append([copy.deepcopy(b.board), [fifty_move_rule, curr_piece_count, has_any_pawn_moved]])
                                     board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
                                     
                                     b.board = out
                                     if board_count.get(board_to_string(b.board)) and board_count[board_to_string(b.board)] == 2:
                                         quit_game('Draw by repetition')
                                     
+                                    curr_piece_count = 0
+                                    for i in range(8):
+                                        for j in range(8):
+                                            if b.board[i][j]:
+                                                curr_piece_count += 1
+                                    if num_pieces == curr_piece_count and not has_any_pawn_moved:
+                                        fifty_move_rule += 1
+
+                                    if has_any_pawn_moved or (num_pieces != curr_piece_count):
+                                        fifty_move_rule = 0 # incremented if the same number of pieces remains
+                                        has_any_pawn_moved = False # if a pawn moves it's set to true
+                                        num_pieces = curr_piece_count # changes only if curr_piece_count is different
+
                                     update = False
                                     white.is_turn_player, black.is_turn_player = switch_players(white)
 
                             elif piece.typ == 'pawn' and len(board_stack) > 0:
-                                out = piece.en_passant(board_stack[-1], b.board, [row, col])
-                                if out and not b.is_pinned(piece, player, [row, col]): 
-                                    board_stack.append(copy.deepcopy(b.board))
+                                out = piece.en_passant(board_stack[-1][0], b.board, [row, col])
+                                if out and not b.is_pinned(piece, player, [row, col]):
+                                    has_any_pawn_moved = True 
+                                    board_stack.append([copy.deepcopy(b.board), [fifty_move_rule, curr_piece_count, has_any_pawn_moved]])
                                     board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
                                     
                                     b.board = out
                                     if board_count.get(board_to_string(b.board)) and board_count[board_to_string(b.board)] == 2:
                                         quit_game('Draw by repetition')
                                     
+                                    curr_piece_count = 0
+                                    for i in range(8):
+                                        for j in range(8):
+                                            if b.board[i][j]:
+                                                curr_piece_count += 1
+                                    if num_pieces == curr_piece_count and not has_any_pawn_moved:
+                                        fifty_move_rule += 1
+
+                                    if has_any_pawn_moved or (num_pieces != curr_piece_count):
+                                        fifty_move_rule = 0 # incremented if the same number of pieces remains
+                                        has_any_pawn_moved = False # if a pawn moves it's set to true
+                                        num_pieces = curr_piece_count # changes only if curr_piece_count is different
+
                                     update = False
                                     white.is_turn_player, black.is_turn_player = switch_players(white)
 
