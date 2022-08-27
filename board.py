@@ -3,8 +3,8 @@ import copy
 class Board:
     def __init__(self):
         self.board = [[None]*8 for i in range(8)]
-        self.white_king = [7, 4]
-        self.black_king = [0, 4]
+        # self.white_king = [7, 4]
+        # self.black_king = [0, 4]
 
     def check_for_knights(self, player, b, x, y):
         for curr_x, curr_y in [[x-2, y-1], [x-2, y+1], [x-1, y-2], [x-1, y+2], [x+1, y-2], [x+1, y+2], [x+2, y-1], [x+2, y+1]]:
@@ -218,12 +218,12 @@ class Board:
                 # add casling and en-passant to the move options
                 if p.typ == 'king':
                     out = p.castle(player, board, new_pos)
-                    if out and not self.under_check(player, p.castle(player, board, new_pos)):
+                    if out and not self.under_check(player, out):
                         return True
 
                 if p.typ == 'pawn':
                     out = p.en_passant(flashback, board, new_pos)
-                    if out and not self.under_check(player, p.en_passant(flashback, board, new_pos)):
+                    if out and not self.under_check(player, out):
                         return True
         return False
 
@@ -250,6 +250,34 @@ class Board:
             return True
         return False
 
+    def insuficient_material(self, white_pieces, black_pieces):
+        # if both players have only kings
+        w_material, b_material = False, False
+        if len(white_pieces) == 1:
+            w_material = True
+        
+        if len(black_pieces) == 1:
+            b_material = True
+        
+        if len(white_pieces) == 2:
+            if white_pieces[0].typ == 'king':
+                if white_pieces[1].typ == 'knight' or white_pieces[1].typ == 'bishop':
+                    w_material = True
+            elif white_pieces[1].typ == 'king':
+                if white_pieces[0].typ == 'knight' or white_pieces[0].typ == 'bishop':
+                    w_material = True
+            
+        if len(black_pieces) == 2:
+            if black_pieces[0].typ == 'king':
+                if black_pieces[1].typ == 'knight' or black_pieces[1].typ == 'bishop':
+                    b_material = True
+            elif black_pieces[1].typ == 'king':
+                if black_pieces[0].typ == 'knight' or black_pieces[0].typ == 'bishop':
+                    b_material = True
+        
+        return w_material and b_material
+
+
     def is_square_unsafe(self, player, pos):
         x, y = pos
         b = self.board
@@ -260,17 +288,12 @@ class Board:
         return False
 
     def under_check(self, player, board):
-        # if player.color == 'white': # as I use a temporary board, king position might change, so using the saved pos is incorrect, pass it as parameter if you can
-        #     x, y = self.white_king[0], self.white_king[1]
-        # else:
-        #     x, y = self.black_king[0], self.black_king[1]
-
         for i in range(8):
             for j in range(8):
                 if board[i][j] and board[i][j].typ == 'king' and board[i][j].color == player.color:
                     x, y = board[i][j].pos[0], board[i][j].pos[1]
                     break
-                    
+        
         b = board
         
         if self.threat_exists(player, b, x, y):
