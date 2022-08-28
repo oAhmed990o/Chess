@@ -124,6 +124,7 @@ class Board:
 
     def check_for_pawns(self, player, b, x, y):
         if player.color == 'white':
+            'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
             if x-1 >=0 and x-1 <8:
                 if y-1 >=0 and y-1 < 8 and b[x-1][y-1]:
                     if player.color != b[x-1][y-1].color and b[x-1][y-1].typ == 'pawn':
@@ -198,7 +199,6 @@ class Board:
         return False
 
     def can_king_be_protected(self, player, flashback, board):
-        # king = self.white_king if player.color == 'white' else self.black_king
         color = player.color
         player_pieces = []
         for i in range(len(board)):
@@ -235,18 +235,20 @@ class Board:
 
     # to be tested
     def stalemate(self, player, board):
-        board = self.board
         if not self.under_check(player, board):
             color = player.color
             player_pieces = []
-            for i in range(len(board)):
-                for j in range(len(board)):
+            for i in range(8):
+                for j in range(8):
                     if board[i][j] and board[i][j].color == color:
                         player_pieces.append(board[i][j])
                         
             for piece in player_pieces: # is possible to call piece functions without passing it a parameter?
-                if piece.get_possible_moves(board):
-                    return False
+                for move in piece.get_possible_moves(board):
+                    temp_board = copy.deepcopy(board)
+                    p = copy.deepcopy(piece)
+                    if not self.under_check(player, p.move(move, temp_board)):
+                        return False
             return True
         return False
 

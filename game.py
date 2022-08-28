@@ -32,7 +32,7 @@ def draw_board(screen, row, col, update):
             p.draw.rect(screen, p.Color(244,232,169,255), p.Rect(col*(height//8), row*(width//8), (width//8), (height//8)))
         else:
             p.draw.rect(screen, p.Color(217,167,108,255), p.Rect(col*(height//8), row*(width//8), (width//8), (height//8)))
-
+        
 def draw_pieces(screen, board):
     for r in range(8):
         for c in range(8):
@@ -79,6 +79,7 @@ def draw_text(screen, font_size, text):
     screen.blit(text_object, text_location)
 
 def switch_players(white):
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
     if white.is_turn_player:
         return [False, True]
     else:
@@ -119,37 +120,71 @@ def quit_game(text):
 
 if __name__ == "__main__":
     b = Board()
-    # adding white pawns
-    for j in range(8):
-        b.board[6][j] = Pawn([6, j], 'white', 'pawn') # pos, color, typ)
-    
-    # adding blackk pawns
-    for j in range(8):
-        b.board[1][j] = Pawn([1, j], 'black', 'pawn')
-    
-    # adding white pieces
-    b.board[7][0] = Rook([7, 0], 'white', 'rook')
-    b.board[7][1] = Knight([7, 1], 'white', 'knight')
-    b.board[7][2] = Bishop([7, 2], 'white', 'bishop')
-    b.board[7][3] = Queen([7, 3], 'white', 'queen')
-    b.board[7][4] = King([7, 4], 'white', 'king')
-    b.board[7][5] = Bishop([7, 5], 'white', 'bishop')
-    b.board[7][6] = Knight([7, 6], 'white', 'knight')
-    b.board[7][7] = Rook([7, 7], 'white', 'rook')
 
-    # adding black pieces
-    b.board[0][0] = Rook([0, 0], 'black', 'rook')
-    b.board[0][1] = Knight([0, 1], 'black', 'knight')
-    b.board[0][2] = Bishop([0, 2], 'black', 'bishop')
-    b.board[0][3] = Queen([0, 3], 'black', 'queen')
-    b.board[0][4] = King([0, 4], 'black', 'king')
-    b.board[0][5] = Bishop([0, 5], 'black', 'bishop')
-    b.board[0][6] = Knight([0, 6], 'black', 'knight')
-    b.board[0][7] = Rook([0, 7], 'black', 'rook')
+    reverse = True
+
+    if reverse:
+            # adding black pawns
+        for j in range(8):
+            b.board[6][j] = Pawn([6, j], 'black', 'pawn') # pos, color, typ)
+        
+        # adding white pawns
+        for j in range(8):
+            b.board[1][j] = Pawn([1, j], 'white', 'pawn')
+        
+        # adding white pieces
+        b.board[7][0] = Rook([7, 0], 'black', 'rook')
+        b.board[7][1] = Knight([7, 1], 'black', 'knight')
+        b.board[7][2] = Bishop([7, 2], 'black', 'bishop')
+        b.board[7][4] = Queen([7, 4], 'black', 'queen')
+        b.board[7][3] = King([7, 3], 'black', 'king')
+        b.board[7][5] = Bishop([7, 5], 'black', 'bishop')
+        b.board[7][6] = Knight([7, 6], 'black', 'knight')
+        b.board[7][7] = Rook([7, 7], 'black', 'rook')
+
+        # adding black pieces
+        b.board[0][0] = Rook([0, 0], 'white', 'rook')
+        b.board[0][1] = Knight([0, 1], 'white', 'knight')
+        b.board[0][2] = Bishop([0, 2], 'white', 'bishop')
+        b.board[0][4] = Queen([0, 4], 'white', 'queen')
+        b.board[0][3] = King([0, 3], 'white', 'king')
+        b.board[0][5] = Bishop([0, 5], 'white', 'bishop')
+        b.board[0][6] = Knight([0, 6], 'white', 'knight')
+        b.board[0][7] = Rook([0, 7], 'white', 'rook')
+
+    else:
+        # adding white pawns
+        for j in range(8):
+            b.board[6][j] = Pawn([6, j], 'white', 'pawn') # pos, color, typ)
+        
+        # adding black pawns
+        for j in range(8):
+            b.board[1][j] = Pawn([1, j], 'black', 'pawn')
+        
+        # adding white pieces
+        b.board[7][0] = Rook([7, 0], 'white', 'rook')
+        b.board[7][1] = Knight([7, 1], 'white', 'knight')
+        b.board[7][2] = Bishop([7, 2], 'white', 'bishop')
+        b.board[7][3] = Queen([7, 3], 'white', 'queen')
+        b.board[7][4] = King([7, 4], 'white', 'king')
+        b.board[7][5] = Bishop([7, 5], 'white', 'bishop')
+        b.board[7][6] = Knight([7, 6], 'white', 'knight')
+        b.board[7][7] = Rook([7, 7], 'white', 'rook')
+
+        # adding black pieces
+        b.board[0][0] = Rook([0, 0], 'black', 'rook')
+        b.board[0][1] = Knight([0, 1], 'black', 'knight')
+        b.board[0][2] = Bishop([0, 2], 'black', 'bishop')
+        b.board[0][3] = Queen([0, 3], 'black', 'queen')
+        b.board[0][4] = King([0, 4], 'black', 'king')
+        b.board[0][5] = Bishop([0, 5], 'black', 'bishop')
+        b.board[0][6] = Knight([0, 6], 'black', 'knight')
+        b.board[0][7] = Rook([0, 7], 'black', 'rook')
 
     white = Player('white')
     white.is_turn_player = True
     black = Player('black')
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
     piece = None
 
     board_stack = []
@@ -179,6 +214,7 @@ if __name__ == "__main__":
         p.display.flip()
 
         player = white if white.is_turn_player else black
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
         if len(board_stack):
             if b.checkmate(player, board_stack[-1][0], b.board):
                 color = 'White' if player.color == 'black' else 'Black'
@@ -189,10 +225,12 @@ if __name__ == "__main__":
 
         curr_piece_count = 0
         white_pieces, black_pieces = [], []
+        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
         for i in range(8):
             for j in range(8):
                 if b.board[i][j] and b.board[i][j].color == 'white':
                     white_pieces.append(b.board[i][j])
+                    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
                 elif b.board[i][j] and b.board[i][j].color == 'black':
                     black_pieces.append(b.board[i][j])
         
@@ -212,15 +250,16 @@ if __name__ == "__main__":
                 if event.key == p.K_z and p.key.get_mods() & p.KMOD_LCTRL:
                     if len(board_stack):
                         b.board, [fifty_move_rule, curr_piece_count, has_any_pawn_moved] = board_stack.pop()
-                        print(fifty_move_rule, curr_piece_count, has_any_pawn_moved)
                     update = False
                     white.is_turn_player, black.is_turn_player = switch_players(white)
+                    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 
             if event.type == p.MOUSEBUTTONDOWN:
                 pos = p.mouse.get_pos()
                 row, col = get_mouse_row_col(pos)
                 if b.board[row][col]:
                     if (b.board[row][col].color == white.color and white.is_turn_player) or (b.board[row][col].color == black.color and black.is_turn_player):
+                        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
                         piece = b.board[row][col]
                         update = True
 
@@ -255,6 +294,7 @@ if __name__ == "__main__":
                                 if piece.typ == 'pawn':
                                     has_any_pawn_moved = True
                                     if (piece.color == 'white' and row == 0) or (piece.color == 'black' and row == 7):
+                                        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
                                         out = None
                                         while not out:
                                             draw_text(screen, 40, 'Choose promotion q: Queen  n: Knight  r: Rook  b: Bishop')
@@ -281,6 +321,7 @@ if __name__ == "__main__":
                                             
                                 update = False
                                 white.is_turn_player, black.is_turn_player = switch_players(white)
+                                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 
                             elif piece.typ == 'king':
                                 
@@ -308,6 +349,7 @@ if __name__ == "__main__":
 
                                     update = False
                                     white.is_turn_player, black.is_turn_player = switch_players(white)
+                                    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 
                             elif piece.typ == 'pawn' and len(board_stack) > 0:
                                 out = piece.en_passant(board_stack[-1][0], b.board, [row, col])
@@ -335,6 +377,7 @@ if __name__ == "__main__":
 
                                     update = False
                                     white.is_turn_player, black.is_turn_player = switch_players(white)
+                                    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 
                         piece = None
                         sq_selected = [] # deselect
