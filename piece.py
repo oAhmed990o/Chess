@@ -5,7 +5,7 @@ class Piece():
         self.typ = typ
         self.has_moved = False
     
-    def get_possible_moves(self, board):
+    def get_possible_moves(self, board, reverse):
         pass
 
     def move(self, new_pos, board): # return board and don't modify a class board

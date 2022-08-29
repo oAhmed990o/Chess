@@ -54,7 +54,7 @@ class King(Piece):
                 return
 
 
-    def get_possible_moves(self, board):
+    def get_possible_moves(self, board, reverse):
         moves = []
         x, y = self.pos[0], self.pos[1]
         for curr_x, curr_y in [[x-1, y-1], [x-1, y], [x-1, y+1], [x, y-1], [x, y+1], [x+1, y-1], [x+1, y], [x+1, y+1]]:

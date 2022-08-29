@@ -79,7 +79,6 @@ def draw_text(screen, font_size, text):
     screen.blit(text_object, text_location)
 
 def switch_players(white):
-    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
     if white.is_turn_player:
         return [False, True]
     else:
@@ -121,7 +120,46 @@ def quit_game(text):
 if __name__ == "__main__":
     b = Board()
 
-    reverse = True
+    chosen = False
+
+    board_stack = []
+    board_count = {}
+
+    p.init()
+    screen = p.display.set_mode((width, height))
+    p.display.set_caption('Chess')
+    load_images()
+    run = True
+    clock = p.time.Clock()
+    update = False
+    row, col = 0, 0
+    
+    sq_selected = []
+    player_clicks = []
+    
+    fifty_move_rule = 0
+    num_pieces = 32
+    has_any_pawn_moved = False
+
+    while not chosen:
+            p.draw.rect(screen, p.Color('white'), p.Rect(0, 0, (width//2), height))
+            p.draw.rect(screen, p.Color('black'), p.Rect((height//2), (width//2), (width//2), height))
+            clock.tick(FPS)
+            p.display.flip()    
+            for event in p.event.get():
+                if event.type == p.QUIT:
+                    run = False
+                if event.type == p.KEYDOWN:
+                    if event.key == p.K_ESCAPE:
+                        p.quit()
+                if event.type == p.MOUSEBUTTONDOWN:
+                    pos = p.mouse.get_pos()
+                    if pos[0] < width//2:
+                        reverse = False
+                        chosen = True
+                    else:
+                        reverse = True
+                        chosen = True
 
     if reverse:
             # adding black pawns
@@ -184,53 +222,52 @@ if __name__ == "__main__":
     white = Player('white')
     white.is_turn_player = True
     black = Player('black')
-    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
     piece = None
-
-    board_stack = []
-    board_count = {}
-
-    p.init()
-    screen = p.display.set_mode((width, height))
-    p.display.set_caption('Chess')
-    load_images()
-    run = True
-    clock = p.time.Clock()
-    update = False
-    row, col = 0, 0
-    
-    sq_selected = []
-    player_clicks = []
-    
-    fifty_move_rule = 0
-    num_pieces = 32
-    has_any_pawn_moved = False
 
     while run:
 
+        # while not chosen:
+        #     p.draw.rect(screen, p.Color('white'), p.Rect(0, 0, (width//2), height))
+        #     p.draw.rect(screen, p.Color('black'), p.Rect((height//2), (width//2), (width//2), height))
+        #     clock.tick(FPS)
+        #     p.display.flip()    
+        #     for event in p.event.get():
+        #         if event.type == p.QUIT:
+        #             run = False
+        #         if event.type == p.KEYDOWN:
+        #             if event.key == p.K_ESCAPE:
+        #                 p.quit()
+        #         if event.type == p.MOUSEBUTTONDOWN:
+        #             pos = p.mouse.get_pos()
+        #             if pos[0] < width//2:
+        #                 reverse = False
+        #                 chosen = True
+        #             else:
+        #                 reverse = True
+        #                 chosen = True
+        
         draw_board(screen, row, col, update)
         draw_pieces(screen, b.board)
         clock.tick(FPS)
         p.display.flip()
 
         player = white if white.is_turn_player else black
-        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+        
         if len(board_stack):
-            if b.checkmate(player, board_stack[-1][0], b.board):
+            if b.checkmate(player, board_stack[-1][0], b.board, reverse):
                 color = 'White' if player.color == 'black' else 'Black'
                 quit_game(color + ' wins by checkmate')
 
-        if b.stalemate(player, b.board):
+        if b.stalemate(player, b.board, reverse):
             quit_game('Stalemate')
 
         curr_piece_count = 0
         white_pieces, black_pieces = [], []
-        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+
         for i in range(8):
             for j in range(8):
                 if b.board[i][j] and b.board[i][j].color == 'white':
                     white_pieces.append(b.board[i][j])
-                    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
                 elif b.board[i][j] and b.board[i][j].color == 'black':
                     black_pieces.append(b.board[i][j])
         
@@ -252,14 +289,12 @@ if __name__ == "__main__":
                         b.board, [fifty_move_rule, curr_piece_count, has_any_pawn_moved] = board_stack.pop()
                     update = False
                     white.is_turn_player, black.is_turn_player = switch_players(white)
-                    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 
             if event.type == p.MOUSEBUTTONDOWN:
                 pos = p.mouse.get_pos()
                 row, col = get_mouse_row_col(pos)
                 if b.board[row][col]:
                     if (b.board[row][col].color == white.color and white.is_turn_player) or (b.board[row][col].color == black.color and black.is_turn_player):
-                        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
                         piece = b.board[row][col]
                         update = True
 
@@ -282,7 +317,7 @@ if __name__ == "__main__":
                         
                         if piece:
                             row, col = player_clicks[1][0], player_clicks[1][1]
-                            if [row, col] in piece.get_possible_moves(b.board) and not b.is_pinned(piece, player, [row, col]):
+                            if [row, col] in piece.get_possible_moves(b.board, reverse) and not b.is_pinned(piece, player, [row, col], reverse):
                                 board_stack.append([copy.deepcopy(b.board), [fifty_move_rule, curr_piece_count, has_any_pawn_moved]])
                                 board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
                                 
@@ -293,8 +328,8 @@ if __name__ == "__main__":
                                 
                                 if piece.typ == 'pawn':
                                     has_any_pawn_moved = True
-                                    if (piece.color == 'white' and row == 0) or (piece.color == 'black' and row == 7):
-                                        'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+                                    
+                                    if (piece.color == 'white' and row == 0 and not reverse) or (piece.color == 'black' and row == 7 and not reverse) or (piece.color == 'white' and row == 7 and reverse) or (piece.color == 'black' and row == 0 and reverse):
                                         out = None
                                         while not out:
                                             draw_text(screen, 40, 'Choose promotion q: Queen  n: Knight  r: Rook  b: Bishop')
@@ -321,7 +356,6 @@ if __name__ == "__main__":
                                             
                                 update = False
                                 white.is_turn_player, black.is_turn_player = switch_players(white)
-                                'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 
                             elif piece.typ == 'king':
                                 
@@ -349,11 +383,10 @@ if __name__ == "__main__":
 
                                     update = False
                                     white.is_turn_player, black.is_turn_player = switch_players(white)
-                                    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 
                             elif piece.typ == 'pawn' and len(board_stack) > 0:
-                                out = piece.en_passant(board_stack[-1][0], b.board, [row, col])
-                                if out and not b.is_pinned(piece, player, [row, col]):
+                                out = piece.en_passant(board_stack[-1][0], b.board, [row, col], reverse)
+                                if out and not b.is_pinned(piece, player, [row, col], reverse):
                                     has_any_pawn_moved = True 
                                     board_stack.append([copy.deepcopy(b.board), [fifty_move_rule, curr_piece_count, has_any_pawn_moved]])
                                     board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
@@ -377,7 +410,6 @@ if __name__ == "__main__":
 
                                     update = False
                                     white.is_turn_player, black.is_turn_player = switch_players(white)
-                                    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 
                         piece = None
                         sq_selected = [] # deselect

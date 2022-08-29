@@ -3,8 +3,6 @@ import copy
 class Board:
     def __init__(self):
         self.board = [[None]*8 for i in range(8)]
-        # self.white_king = [7, 4]
-        # self.black_king = [0, 4]
 
     def check_for_knights(self, player, b, x, y):
         for curr_x, curr_y in [[x-2, y-1], [x-2, y+1], [x-1, y-2], [x-1, y+2], [x+1, y-2], [x+1, y+2], [x+2, y-1], [x+2, y+1]]:
@@ -122,24 +120,41 @@ class Board:
                         return True
         return False
 
-    def check_for_pawns(self, player, b, x, y):
-        if player.color == 'white':
-            'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-            if x-1 >=0 and x-1 <8:
-                if y-1 >=0 and y-1 < 8 and b[x-1][y-1]:
-                    if player.color != b[x-1][y-1].color and b[x-1][y-1].typ == 'pawn':
-                        return True
-                if y+1 >=0 and y+1 < 8 and b[x-1][y+1]:
-                    if player.color != b[x-1][y+1].color and b[x-1][y+1].typ == 'pawn':
-                        return True
+    def check_for_pawns(self, player, b, x, y, reverse):
+        if reverse:
+            if player.color == 'black':
+                if x-1 >=0 and x-1 <8:
+                    if y-1 >=0 and y-1 < 8 and b[x-1][y-1]:
+                        if player.color != b[x-1][y-1].color and b[x-1][y-1].typ == 'pawn':
+                            return True
+                    if y+1 >=0 and y+1 < 8 and b[x-1][y+1]:
+                        if player.color != b[x-1][y+1].color and b[x-1][y+1].typ == 'pawn':
+                            return True
+            else:
+                if x+1 >=0 and x+1 <8:
+                    if y-1 >=0 and y-1 < 8 and b[x+1][y-1]:
+                        if player.color != b[x+1][y-1].color and b[x+1][y-1].typ == 'pawn':
+                            return True
+                    if y+1 >=0 and y+1 < 8 and b[x+1][y+1]:
+                        if player.color != b[x+1][y+1].color and b[x+1][y+1].typ == 'pawn':
+                            return True
         else:
-            if x+1 >=0 and x+1 <8:
-                if y-1 >=0 and y-1 < 8 and b[x+1][y-1]:
-                    if player.color != b[x+1][y-1].color and b[x+1][y-1].typ == 'pawn':
-                        return True
-                if y+1 >=0 and y+1 < 8 and b[x+1][y+1]:
-                    if player.color != b[x+1][y+1].color and b[x+1][y+1].typ == 'pawn':
-                        return True
+            if player.color == 'white':
+                if x-1 >=0 and x-1 <8:
+                    if y-1 >=0 and y-1 < 8 and b[x-1][y-1]:
+                        if player.color != b[x-1][y-1].color and b[x-1][y-1].typ == 'pawn':
+                            return True
+                    if y+1 >=0 and y+1 < 8 and b[x-1][y+1]:
+                        if player.color != b[x-1][y+1].color and b[x-1][y+1].typ == 'pawn':
+                            return True
+            else:
+                if x+1 >=0 and x+1 <8:
+                    if y-1 >=0 and y-1 < 8 and b[x+1][y-1]:
+                        if player.color != b[x+1][y-1].color and b[x+1][y-1].typ == 'pawn':
+                            return True
+                    if y+1 >=0 and y+1 < 8 and b[x+1][y+1]:
+                        if player.color != b[x+1][y+1].color and b[x+1][y+1].typ == 'pawn':
+                            return True
         return False
 
     def check_for_king(self, player, b, x, y):
@@ -151,9 +166,9 @@ class Board:
                         return True
         return False
 
-    def threat_exists(self, player, b, x, y):
+    def threat_exists(self, player, b, x, y, reverse):
         # check for pawns
-        if self.check_for_pawns(player, b, x, y):
+        if self.check_for_pawns(player, b, x, y, reverse):
             return True
 
         # check for knights
@@ -198,7 +213,7 @@ class Board:
         
         return False
 
-    def can_king_be_protected(self, player, flashback, board):
+    def can_king_be_protected(self, player, flashback, board, reverse):
         color = player.color
         player_pieces = []
         for i in range(len(board)):
@@ -207,35 +222,35 @@ class Board:
                     player_pieces.append(board[i][j])
                     
         for piece in player_pieces: # is possible to call piece functions without passing it a parameter?
-            moves = piece.get_possible_moves(board)
+            moves = piece.get_possible_moves(board, reverse)
             
             for new_pos in moves:
                 b = copy.deepcopy(board)
                 p = copy.deepcopy(piece)
-                if not self.under_check(player, p.move(new_pos, b)):
+                if not self.under_check(player, p.move(new_pos, b), reverse):
                     return True
 
                 # add casling and en-passant to the move options
                 if p.typ == 'king':
-                    out = p.castle(player, board, new_pos)
-                    if out and not self.under_check(player, out):
+                    out = p.castle(player, board, new_pos, reverse)
+                    if out and not self.under_check(player, out, reverse):
                         return True
 
                 if p.typ == 'pawn':
-                    out = p.en_passant(flashback, board, new_pos)
-                    if out and not self.under_check(player, out):
+                    out = p.en_passant(flashback, board, new_pos, reverse)
+                    if out and not self.under_check(player, out, reverse):
                         return True
         return False
 
 
-    def checkmate(self, player, flashback, board): 
-        if self.under_check(player, board) and not self.can_king_be_protected(player, flashback, board):
+    def checkmate(self, player, flashback, board, reverse): 
+        if self.under_check(player, board, reverse) and not self.can_king_be_protected(player, flashback, board, reverse):
             return True
         return False
 
     # to be tested
-    def stalemate(self, player, board):
-        if not self.under_check(player, board):
+    def stalemate(self, player, board, reverse):
+        if not self.under_check(player, board, reverse):
             color = player.color
             player_pieces = []
             for i in range(8):
@@ -244,10 +259,11 @@ class Board:
                         player_pieces.append(board[i][j])
                         
             for piece in player_pieces: # is possible to call piece functions without passing it a parameter?
-                for move in piece.get_possible_moves(board):
+                for move in piece.get_possible_moves(board, reverse):
+                    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx'
                     temp_board = copy.deepcopy(board)
                     p = copy.deepcopy(piece)
-                    if not self.under_check(player, p.move(move, temp_board)):
+                    if not self.under_check(player, p.move(move, temp_board), reverse):
                         return False
             return True
         return False
@@ -280,16 +296,16 @@ class Board:
         return w_material and b_material
 
 
-    def is_square_unsafe(self, player, pos):
+    def is_square_unsafe(self, player, pos, reverse):
         x, y = pos
         b = self.board
 
-        if self.threat_exists(player, b, x, y):
+        if self.threat_exists(player, b, x, y, reverse):
             return True
     
         return False
 
-    def under_check(self, player, board):
+    def under_check(self, player, board, reverse):
         for i in range(8):
             for j in range(8):
                 if board[i][j] and board[i][j].typ == 'king' and board[i][j].color == player.color:
@@ -298,18 +314,18 @@ class Board:
         
         b = board
         
-        if self.threat_exists(player, b, x, y):
+        if self.threat_exists(player, b, x, y, reverse):
             return True
 
         return False
 
-    def is_pinned(self, piece, player, new_pos):
+    def is_pinned(self, piece, player, new_pos, reverse):
         temp_board = copy.deepcopy(self.board)
         temp_board[new_pos[0]][new_pos[1]] = piece
         temp_board[piece.pos[0]][piece.pos[1]] = None
         old_pos = piece.pos
         piece.pos = new_pos
-        if self.under_check(player, temp_board):
+        if self.under_check(player, temp_board, reverse):
             piece.pos = old_pos
             return True
         else:

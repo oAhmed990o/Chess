@@ -4,14 +4,14 @@ class Pawn(Piece):
     def __init__(self, pos, color, typ):
         super().__init__(pos, color, typ)
 
-    def en_passant(self, flashback, board, pos):
+    def en_passant(self, flashback, board, pos, reverse):
         x, y = pos # new position
         r, c = self.pos[0], self.pos[1] # current position
         
-        if self.color == 'white':
-            step = -1 # if 'white'
+        if reverse:
+            step = 1 if self.color == 'white' else -1
         else:
-            step = 1 # if 'black'
+            step = -1 if self.color == 'white' else 1
         
         if c-1 >= 0 and board[r][c-1] and board[r][c-1].typ == 'pawn' and board[r][c-1].color != self.color and (board[r+2*step][c-1] is None) and flashback[r+2*step][c-1] and flashback[r+2*step][c-1].typ == 'pawn' and flashback[r+2*step][c-1].color != self.color and (flashback[r][c-1] is None):
             if x == r+step and y == c-1:
@@ -30,11 +30,14 @@ class Pawn(Piece):
                 return board
         return
 
-    def get_possible_moves(self, board):
+    def get_possible_moves(self, board, reverse):
         moves = []
         x, y = self.pos[0], self.pos[1]
 
-        step = -1 if self.color == 'white' else 1
+        if reverse:
+            step = 1 if self.color == 'white' else -1
+        else:
+            step = -1 if self.color == 'white' else 1
         
         # two squares forward
         if not self.has_moved:
