@@ -260,7 +260,6 @@ class Board:
                         
             for piece in player_pieces: # is possible to call piece functions without passing it a parameter?
                 for move in piece.get_possible_moves(board, reverse):
-                    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx'
                     temp_board = copy.deepcopy(board)
                     p = copy.deepcopy(piece)
                     if not self.under_check(player, p.move(move, temp_board), reverse):

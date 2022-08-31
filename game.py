@@ -223,28 +223,10 @@ if __name__ == "__main__":
     white.is_turn_player = True
     black = Player('black')
     piece = None
+    
+    board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
 
     while run:
-
-        # while not chosen:
-        #     p.draw.rect(screen, p.Color('white'), p.Rect(0, 0, (width//2), height))
-        #     p.draw.rect(screen, p.Color('black'), p.Rect((height//2), (width//2), (width//2), height))
-        #     clock.tick(FPS)
-        #     p.display.flip()    
-        #     for event in p.event.get():
-        #         if event.type == p.QUIT:
-        #             run = False
-        #         if event.type == p.KEYDOWN:
-        #             if event.key == p.K_ESCAPE:
-        #                 p.quit()
-        #         if event.type == p.MOUSEBUTTONDOWN:
-        #             pos = p.mouse.get_pos()
-        #             if pos[0] < width//2:
-        #                 reverse = False
-        #                 chosen = True
-        #             else:
-        #                 reverse = True
-        #                 chosen = True
         
         draw_board(screen, row, col, update)
         draw_pieces(screen, b.board)
@@ -277,6 +259,9 @@ if __name__ == "__main__":
         if fifty_move_rule == 100:
             quit_game('Draw due to no progress')
 
+        if board_count.get(board_to_string(b.board)) and board_count[board_to_string(b.board)] == 3:
+            quit_game('Draw by repetition')
+
         for event in p.event.get():
             if event.type == p.QUIT:
                 run = False
@@ -286,9 +271,14 @@ if __name__ == "__main__":
             if event.type == p.KEYDOWN:
                 if event.key == p.K_z and p.key.get_mods() & p.KMOD_LCTRL:
                     if len(board_stack):
+                        # print('before:\n', board_to_string(board_stack[-1][0]), '\n')
+                        if board_count.get(board_to_string(b.board)):
+                            board_count[board_to_string(b.board)] -= 1
+                            
                         b.board, [fifty_move_rule, curr_piece_count, has_any_pawn_moved] = board_stack.pop()
-                    update = False
-                    white.is_turn_player, black.is_turn_player = switch_players(white)
+                        # print('after:\n', board_to_string(board_stack[-1][0]))
+                        update = False
+                        white.is_turn_player, black.is_turn_player = switch_players(white)
 
             if event.type == p.MOUSEBUTTONDOWN:
                 pos = p.mouse.get_pos()
@@ -319,18 +309,16 @@ if __name__ == "__main__":
                             row, col = player_clicks[1][0], player_clicks[1][1]
                             if [row, col] in piece.get_possible_moves(b.board, reverse) and not b.is_pinned(piece, player, [row, col], reverse):
                                 board_stack.append([copy.deepcopy(b.board), [fifty_move_rule, curr_piece_count, has_any_pawn_moved]])
-                                board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
                                 
                                 b.board = piece.move([row, col], b.board)
-
-                                if board_count.get(board_to_string(b.board)) and board_count[board_to_string(b.board)] == 2:
-                                    quit_game('Draw by repetition')
+                                board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
                                 
                                 if piece.typ == 'pawn':
                                     has_any_pawn_moved = True
                                     
                                     if (piece.color == 'white' and row == 0 and not reverse) or (piece.color == 'black' and row == 7 and not reverse) or (piece.color == 'white' and row == 7 and reverse) or (piece.color == 'black' and row == 0 and reverse):
                                         out = None
+                                        board_count[board_to_string(b.board)] -= 1
                                         while not out:
                                             draw_text(screen, 40, 'Choose promotion q: Queen  n: Knight  r: Rook  b: Bishop')
                                             p.display.update()
@@ -340,6 +328,7 @@ if __name__ == "__main__":
                                                     if out:
                                                         b.board = out
                                                         break
+                                        board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
 
                                 curr_piece_count = 0
                                 for i in range(8):
@@ -358,15 +347,12 @@ if __name__ == "__main__":
                                 white.is_turn_player, black.is_turn_player = switch_players(white)
 
                             elif piece.typ == 'king':
+                                board_stack.append([copy.deepcopy(b.board), [fifty_move_rule, curr_piece_count, has_any_pawn_moved]])
                                 
-                                out = piece.castle(player, b, [row, col])
+                                out = piece.castle(player, b, [row, col], reverse)
                                 if out:
-                                    board_stack.append([copy.deepcopy(b.board), [fifty_move_rule, curr_piece_count, has_any_pawn_moved]])
-                                    board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
-                                    
                                     b.board = out
-                                    if board_count.get(board_to_string(b.board)) and board_count[board_to_string(b.board)] == 2:
-                                        quit_game('Draw by repetition')
+                                    board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
                                     
                                     curr_piece_count = 0
                                     for i in range(8):
@@ -383,17 +369,17 @@ if __name__ == "__main__":
 
                                     update = False
                                     white.is_turn_player, black.is_turn_player = switch_players(white)
+                                else:
+                                    board_stack.pop()
 
                             elif piece.typ == 'pawn' and len(board_stack) > 0:
-                                out = piece.en_passant(board_stack[-1][0], b.board, [row, col], reverse)
-                                if out and not b.is_pinned(piece, player, [row, col], reverse):
-                                    has_any_pawn_moved = True 
-                                    board_stack.append([copy.deepcopy(b.board), [fifty_move_rule, curr_piece_count, has_any_pawn_moved]])
-                                    board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
-                                    
+                                board_stack.append([copy.deepcopy(b.board), [fifty_move_rule, curr_piece_count, has_any_pawn_moved]])
+                                out = piece.en_passant(board_stack[-2][0], b.board, [row, col], reverse)
+                                if out and not b.under_check(player, out, reverse):
+                                     
+                                    has_any_pawn_moved = True
                                     b.board = out
-                                    if board_count.get(board_to_string(b.board)) and board_count[board_to_string(b.board)] == 2:
-                                        quit_game('Draw by repetition')
+                                    board_count[board_to_string(b.board)] = board_count.get(board_to_string(b.board), 0) + 1
                                     
                                     curr_piece_count = 0
                                     for i in range(8):
@@ -410,6 +396,8 @@ if __name__ == "__main__":
 
                                     update = False
                                     white.is_turn_player, black.is_turn_player = switch_players(white)
+                                else:
+                                    board_stack.pop()
 
                         piece = None
                         sq_selected = [] # deselect
