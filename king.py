@@ -8,90 +8,90 @@ class King(Piece):
         if abs(self.pos[1] - position[1]) != 2 or self.has_moved:
             return
         b = board.board
-        x, y = position
+        clicked_row, clicked_col = position
         if not reverse:
-            if position[1] < self.pos[1]: # long castling
-                if b[x][y-2] and b[x][y-2].typ == 'rook' and (not b[x][y-2].has_moved) and b[x][y-2].color == self.color:
+            if clicked_col < self.pos[1]: # long castling
+                if b[clicked_row][clicked_col-2] and b[clicked_row][clicked_col-2].typ == 'rook' and (not b[clicked_row][clicked_col-2].has_moved) and b[clicked_row][clicked_col-2].color == self.color:
                     for i in range(self.pos[1]-1, 0, -1):
-                        if b[x][i] or board.is_square_unsafe(player, [x , i], reverse):
+                        if b[clicked_row][i] or board.is_square_unsafe(player, [clicked_row , i], reverse):
                             return
                     if board.under_check(player, b, reverse):
                         return
                     else:
                         # do the castling
                         # change the saved king pos int he board constructor later*
-                        b[x][y] = self
+                        b[clicked_row][clicked_col] = self
                         b[self.pos[0]][self.pos[1]] = None
-                        self.pos = [x, y]
+                        self.pos = [clicked_row, clicked_col]
                         self.has_moved = True
-                        b[x][y+1] = b[x][y-2] # move the rook
-                        b[x][y-2] = None
-                        b[x][y+1].pos = [x, y+1]
-                        b[x][y+1].has_moved = True
+                        b[clicked_row][clicked_col+1] = b[clicked_row][clicked_col-2] # move the rook
+                        b[clicked_row][clicked_col-2] = None
+                        b[clicked_row][clicked_col+1].pos = [clicked_row, clicked_col+1]
+                        b[clicked_row][clicked_col+1].has_moved = True
                         return b
                 else:
                     return
             else: # short castling
-                if b[x][y+1] and b[x][y+1].typ == 'rook' and (not b[x][y+1].has_moved) and b[x][y+1].color == self.color:
+                if b[clicked_row][clicked_col+1] and b[clicked_row][clicked_col+1].typ == 'rook' and (not b[clicked_row][clicked_col+1].has_moved) and b[clicked_row][clicked_col+1].color == self.color:
                     for i in range(self.pos[1]+1, 7):
-                        if b[x][i] or board.is_square_unsafe(player, [x , i], reverse):
+                        if b[clicked_row][i] or board.is_square_unsafe(player, [clicked_row , i], reverse):
                             return
                     if board.under_check(player, b, reverse):
                         return
                     else:
                         # do the castling
                         # change the saved king pos int he board constructor later*
-                        b[x][y] = self
+                        b[clicked_row][clicked_col] = self
                         b[self.pos[0]][self.pos[1]] = None
-                        self.pos = [x, y]
+                        self.pos = [clicked_row, clicked_col]
                         self.has_moved = True
-                        b[x][y-1] = b[x][y+1] # move the rook
-                        b[x][y+1] = None
-                        b[x][y-1].pos = [x, y-1]
-                        b[x][y-1].has_moved = True
+                        b[clicked_row][clicked_col-1] = b[clicked_row][clicked_col+1] # move the rook
+                        b[clicked_row][clicked_col+1] = None
+                        b[clicked_row][clicked_col-1].pos = [clicked_row, clicked_col-1]
+                        b[clicked_row][clicked_col-1].has_moved = True
                         return b
                 else:
                     return
         else:
-            if position[1] > self.pos[1]: # long castling
-                if b[x][y+2] and b[x][y+2].typ == 'rook' and (not b[x][y+2].has_moved) and b[x][y+2].color == self.color:
-                    for i in range(self.pos[1]+1, 8):
-                        if b[x][i] or board.is_square_unsafe(player, [x , i], reverse):
+            if clicked_col > self.pos[1]: # long castling
+                if b[clicked_row][clicked_col+2] and b[clicked_row][clicked_col+2].typ == 'rook' and (not b[clicked_row][clicked_col+2].has_moved) and b[clicked_row][clicked_col+2].color == self.color:
+                    for i in range(self.pos[1]+1, 7):
+                        if b[clicked_row][i] or board.is_square_unsafe(player, [clicked_row , i], reverse):
                             return
                     if board.under_check(player, b, reverse):
                         return
                     else:
                         # do the castling
                         # change the saved king pos int he board constructor later*
-                        b[x][y] = self
+                        b[clicked_row][clicked_col] = self
                         b[self.pos[0]][self.pos[1]] = None
-                        self.pos = [x, y]
+                        self.pos = [clicked_row, clicked_col]
                         self.has_moved = True
-                        b[x][y-1] = b[x][y+2] # move the rook
-                        b[x][y+2] = None
-                        b[x][y-1].pos = [x, y-1]
-                        b[x][y-1].has_moved = True
+                        b[clicked_row][clicked_col-1] = b[clicked_row][clicked_col+2] # move the rook
+                        b[clicked_row][clicked_col+2] = None
+                        b[clicked_row][clicked_col-1].pos = [clicked_row, clicked_col-1]
+                        b[clicked_row][clicked_col-1].has_moved = True
                         return b
                 else:
                     return
             else: # short castling
-                if b[x][y-1] and b[x][y-1].typ == 'rook' and (not b[x][y-1].has_moved) and b[x][y-1].color == self.color:
+                if b[clicked_row][clicked_col-1] and b[clicked_row][clicked_col-1].typ == 'rook' and (not b[clicked_row][clicked_col-1].has_moved) and b[clicked_row][clicked_col-1].color == self.color:
                     for i in range(self.pos[1]-1, 0, -1):
-                        if b[x][i] or board.is_square_unsafe(player, [x , i], reverse):
+                        if b[clicked_row][i] or board.is_square_unsafe(player, [clicked_row , i], reverse):
                             return
                     if board.under_check(player, b, reverse):
                         return
                     else:
                         # do the castling
                         # change the saved king pos int he board constructor later*
-                        b[x][y] = self
+                        b[clicked_row][clicked_col] = self
                         b[self.pos[0]][self.pos[1]] = None
-                        self.pos = [x, y]
+                        self.pos = [clicked_row, clicked_col]
                         self.has_moved = True
-                        b[x][y+1] = b[x][y-1] # move the rook
-                        b[x][y-1] = None
-                        b[x][y+1].pos = [x, y+1]
-                        b[x][y+1].has_moved = True
+                        b[clicked_row][clicked_col+1] = b[clicked_row][clicked_col-1] # move the rook
+                        b[clicked_row][clicked_col-1] = None
+                        b[clicked_row][clicked_col+1].pos = [clicked_row, clicked_col+1]
+                        b[clicked_row][clicked_col+1].has_moved = True
                         return b
                 else:
                     return
