@@ -4,7 +4,7 @@ class Bishop(Piece):
     def __init__(self, pos, color, typ):
         super().__init__(pos, color, typ)
     
-    def get_possible_moves(self, board):
+    def get_possible_moves(self, board, reverse):
         moves = []
         x, y = self.pos[0], self.pos[1]
         

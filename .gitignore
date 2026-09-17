@@ -1,0 +1,48 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# PyInstaller build output (game.spec is kept, it's the build config)
+build/
+dist/
+*.manifest
+
+# Downloaded datasets, papers and training data (5GB+, not source)
+dl/
+
+# Model checkpoints / weights
+*.pt
+*.pth
+*.h5
+*.ckpt
+*.pkl
+*.npy
+*.npz
+
+# Distribution / packaging
+*.egg-info/
+.eggs/
+*.egg
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Editors and OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
